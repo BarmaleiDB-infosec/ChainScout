@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: chainscout-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/chainscout.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - frontend
+      - api
+    networks:
+      - chainscout-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # React Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
+        - VITE_API_URL=${VITE_API_URL:-http://api:4000}
+    container_name: chainscout-frontend
+    expose:
+      - "5173"
+    networks:
+      - chainscout-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+
+  # Node.js Backend API
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: chainscout-api
+    expose:
+      - "4000"
+    depends_on:
+      - postgres
+    networks:
+      - chainscout-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=4000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://chainscout:chainscout@postgres:5432/chainscout}
+      - CORS_ORIGIN=http://localhost,http://localhost:80,http://localhost:443,https://localhost,https://app.chainscout.com,https://api.chainscout.com
+      - API_REQUIRE_AUTH=${API_REQUIRE_AUTH:-true}
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX=30
+      - MAX_UPLOAD_BYTES=26214400
+      - ETHERSCAN_API_KEY=${ETHERSCAN_API_KEY}
+      - INFURA_API_KEY=${INFURA_API_KEY}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: chainscout-postgres
+    expose:
+      - "5432"
+    networks:
+      - chainscout-network
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=chainscout
+      - POSTGRES_PASSWORD=chainscout
+      - POSTGRES_DB=chainscout
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chainscout"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  chainscout-network:
+    driver: bridge

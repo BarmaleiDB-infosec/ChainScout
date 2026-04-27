@@ -1,0 +1,71 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 🔒 Чувствительные данные - НЕ МИГРАТЬ В ГИТ
+# Environment variables
+.env
+.env.local
+.env.*.local
+server/.env
+server/.env.local
+
+# MSSQL Database files
+*.mdf
+*.ldf
+*.ndf
+*.mdb
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads и загруженные файлы
+server/uploads/
+server/data/scan-feedback.jsonl
+server/data/
+
+# API ключи и credentials
+.credentials
+.aws
+.ssh
+secrets/
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# Python
+.venv
+__pycache__
+*.pyc
+.Python
+
+# OS
+Thumbs.db
+.DS_Store
+.env.production
+.env.staging

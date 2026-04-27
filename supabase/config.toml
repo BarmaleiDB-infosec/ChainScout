@@ -1,0 +1,10 @@
+project_id = "rrcbgqledrotnnvpjtnk"
+
+[functions.chat-gpt]
+verify_jwt = true
+
+[functions.analyze-security]
+verify_jwt = true
+
+[functions.generate-pdf-report]
+verify_jwt = true
