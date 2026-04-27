@@ -1,7 +1,15 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "chainscout",
+  "description": "Automated smart contract security scanner for Ethereum and multi-chain platforms",
+  "homepage": "https://github.com/BarmaleiDB-infosec/ChainScout",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BarmaleiDB-infosec/ChainScout.git"
+  },
+  "author": "BarmaleiDB Security Team",
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

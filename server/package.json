@@ -1,11 +1,20 @@
 {
-  "name": "chain-scout-server",
-  "version": "0.1.0",
+  "name": "chainscout-server",
+  "description": "ChainScout Backend API - Smart Contract Security Scanner",
+  "version": "1.0.0",
+  "author": "BarmaleiDB Security Team",
+  "license": "MIT",
+  "homepage": "https://github.com/BarmaleiDB-infosec/ChainScout",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BarmaleiDB-infosec/ChainScout.git"
+  },
   "private": true,
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "node test-supabase-integration.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

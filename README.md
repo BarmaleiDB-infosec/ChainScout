@@ -1,6 +1,15 @@
 # ChainScout - Automated Smart Contract Security Scanner
 
-**ChainScout** is an open-source MVP platform for automated static analysis and security auditing of Ethereum smart contracts and Web3 applications.
+<p align="center">
+  <img src="https://img.shields.io/badge/status-production%20ready-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+  <img src="https://img.shields.io/badge/security-0%20critical%20CVEs-success" alt="Security">
+  <img src="https://img.shields.io/badge/detectors-7-coral" alt="Detectors">
+  <img src="https://img.shields.io/badge/chains-5-midnightblue" alt="Chains">
+  <img src="https://img.shields.io/github/v/release/BarmaleiDB-infosec/ChainScout?label=version" alt="Version">
+</p>
+
+**ChainScout** is an open-source platform for automated static analysis and security auditing of Ethereum smart contracts and Web3 applications.
 
 ## 🎯 Key Features
 
