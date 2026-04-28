@@ -19,8 +19,13 @@ const ETHERSCAN_TESTNET_URLS = {
  */
 async function getContractSourceCode(address, chain = 'mainnet') {
   const apiKey = process.env.ETHERSCAN_API_KEY;
-  if (!apiKey) {
-    throw new Error('ETHERSCAN_API_KEY not configured');
+  
+  // Enhanced error handling for missing API key
+  if (!apiKey || apiKey === 'YOUR_ETHERSCAN_API_KEY' || apiKey.trim() === '') {
+    throw new Error(
+      'Etherscan API key not configured. Set ETHERSCAN_API_KEY environment variable. ' +
+      'Get one from: https://etherscan.io/apis'
+    );
   }
 
   // Normalize address
@@ -39,8 +44,21 @@ async function getContractSourceCode(address, chain = 'mainnet') {
     });
 
     const result = response.data?.result?.[0];
-    if (!result || result.SourceCode === '') {
-      throw new Error(`Contract not found or not verified on ${chain}`);
+    
+    // Enhanced error handling for unverified contracts
+    if (!result) {
+      throw new Error(
+        `Contract ${normalizedAddress} not found on ${chain}. ` +
+        'Verify it exists and is deployed on the correct network.'
+      );
+    }
+    
+    if (result.SourceCode === '') {
+      throw new Error(
+        `Contract ${normalizedAddress} is not verified on ${chain}. ` +
+        'Only verified contracts can be analyzed. ' +
+        'Please verify it on Etherscan first.'
+      );
     }
 
     return {
@@ -58,9 +76,17 @@ async function getContractSourceCode(address, chain = 'mainnet') {
     };
   } catch (error) {
     if (error.response?.status === 429) {
-      throw new Error('Etherscan API rate limit exceeded. Try again in a moment.');
+      throw new Error(
+        'Etherscan API rate limit exceeded. The free tier allows limited requests. ' +
+        'Try again in a moment or upgrade your API key.'
+      );
     }
-    throw new Error(`Failed to fetch contract from Etherscan: ${error.message}`);
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Etherscan API request timeout. Network may be slow. Try again.');
+    }
+    // Re-throw with enhanced context
+    throw error instanceof Error ? error : 
+      new Error(`Failed to fetch contract from Etherscan: ${error.message}`);
   }
 }
 

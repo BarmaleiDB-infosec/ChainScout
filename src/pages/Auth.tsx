@@ -5,28 +5,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, ArrowLeft, AlertCircle } from "lucide-react";
-import { mockAuthService } from "@/lib/mock-auth";
+import { Shield, ArrowLeft, AlertCircle, Github, Chrome } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { signUpSchema, signInSchema } from "@/lib/auth-validation";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<'google' | 'github' | null>(null);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, signInWithOAuth, error: authError } = useAuth();
 
   useEffect(() => {
     if (user) {
       navigate("/");
     }
   }, [user, navigate]);
+
+  useEffect(() => {
+    if (authError) {
+      toast({
+        title: "Authentication Error",
+        description: authError,
+        variant: "destructive",
+      });
+    }
+  }, [authError, toast]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,25 +57,25 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await mockAuthService.signUp(email, password);
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
 
       if (error) throw error;
 
-      // Trigger auth update in other components
-      window.dispatchEvent(new Event('auth-changed'));
-
       toast({
         title: t('registrationSuccess'),
-        description: "Добро пожаловать! Вы зарегистрированы.",
+        description: "Check your email for confirmation link.",
       });
       
       setEmail("");
       setPassword("");
-      
-      // Navigate immediately
-      navigate("/dashboard");
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      const message = error instanceof Error ? error.message : 'Unknown error';
       toast({
         title: t('registrationError'),
         description: message,
@@ -93,22 +104,21 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await mockAuthService.signIn(email, password);
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) throw error;
 
-      // Trigger auth update in other components
-      window.dispatchEvent(new Event('auth-changed'));
-
       toast({
-        title: "Успешно",
-        description: "Вы вошли в систему",
+        title: "Success",
+        description: "You have signed in successfully.",
       });
 
-      // Navigate immediately
       navigate("/dashboard");
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      const message = error instanceof Error ? error.message : 'Unknown error';
       toast({
         title: t('loginError'),
         description: message,
@@ -116,6 +126,15 @@ const Auth = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
+    setOauthLoading(provider);
+    try {
+      await signInWithOAuth(provider);
+    } finally {
+      setOauthLoading(null);
     }
   };
 
@@ -204,6 +223,40 @@ const Auth = () => {
                     {loading ? t('signingIn') : t('signIn')}
                   </Button>
                 </form>
+
+                {/* OAuth Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+
+                {/* OAuth Buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={oauthLoading !== null}
+                    onClick={() => handleOAuthSignIn('google')}
+                    className="w-full"
+                  >
+                    <Chrome className="w-4 h-4 mr-2" />
+                    {oauthLoading === 'google' ? 'Loading...' : 'Google'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={oauthLoading !== null}
+                    onClick={() => handleOAuthSignIn('github')}
+                    className="w-full"
+                  >
+                    <Github className="w-4 h-4 mr-2" />
+                    {oauthLoading === 'github' ? 'Loading...' : 'GitHub'}
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4 mt-4">
