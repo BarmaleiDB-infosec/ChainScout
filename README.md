@@ -1,4 +1,9 @@
 # ChainScout - Automated Smart Contract Security Scanner
+<img width="1494" height="733" alt="image" src="https://github.com/user-attachments/assets/21e04ac7-55f9-4788-ade7-2c0567395d64" />
+<img width="1180" height="609" alt="image" src="https://github.com/user-attachments/assets/d6f94740-d1cb-4b8c-9c74-c41c2a421619" />
+<img width="1419" height="786" alt="image" src="https://github.com/user-attachments/assets/39155991-a3d8-4527-8400-baeba161d404" />
+
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-production%20ready-brightgreen" alt="Status">
