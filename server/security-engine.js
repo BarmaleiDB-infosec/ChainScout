@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ChainScout Security Engine
  * Detects 7 critical Solidity vulnerability categories
  * 
@@ -393,7 +393,7 @@ function deduplicateFindings(findings) {
 }
 
 // Export functions
-module.exports = {
+module.exports = { analyzeBytecodeViaInfura, contractExists, analyzeSolanaProgram, programExists,
   analyzeSolidityCode,
   detectReentrancy,
   detectIntegerArithmetic,
@@ -403,3 +403,98 @@ module.exports = {
   detectAccessControl,
   detectTimestampDependence,
 };
+
+// ============================================
+// INFURA INTEGRATION — Bytecode-based analysis
+// ============================================
+const { getContractBytecode, contractExists } = require("./infura-client");
+
+async function analyzeBytecodeViaInfura(address, chain = "mainnet") {
+  const bytecode = await getContractBytecode(address, chain);
+  const findings = [];
+  
+  if (bytecode.includes("f4") || bytecode.includes("F4")) {
+    findings.push({
+      category: "Delegatecall Detected",
+      severity: "medium",
+      description: "Contract uses delegatecall (detected in bytecode). Verify target addresses are trusted.",
+    });
+  }
+  
+  if (bytecode.includes("ff") || bytecode.includes("FF")) {
+    findings.push({
+      category: "Selfdestruct Detected",
+      severity: "high",
+      description: "Contract contains selfdestruct opcode. Review authorization logic.",
+    });
+  }
+  
+  if (bytecode.includes("42") && bytecode.includes("43")) {
+    findings.push({
+      category: "Timestamp Usage",
+      severity: "low",
+      description: "Contract uses block.timestamp or block.number. Verify no critical logic depends on them.",
+    });
+  }
+  
+  return {
+    address,
+    chain,
+    bytecodeSize: bytecode.length / 2 - 1,
+    findings,
+    hasDelegatecall: bytecode.includes("f4") || bytecode.includes("F4"),
+    hasSelfdestruct: bytecode.includes("ff") || bytecode.includes("FF"),
+  };
+}
+// ============================================
+// SOLANA INTEGRATION — Program analysis
+// ============================================
+const { getProgramInfo, programExists } = require("./solana-client");
+
+async function analyzeSolanaProgram(programId, network = "mainnet") {
+  const info = await getProgramInfo(programId, network);
+  const findings = [];
+  
+  const UPGRADEABLE_LOADER = "BPFLoaderUpgradeab1e11111111111111111111111";
+  if (info.owner === UPGRADEABLE_LOADER) {
+    findings.push({
+      category: "Upgradeable Program",
+      severity: "medium",
+      description: "Program is upgradeable. Verify the upgrade authority is secure (multi-sig or governance).",
+      recommendation: "Use a multi-sig or governance-controlled upgrade authority.",
+    });
+  }
+  
+  if (info.dataSize < 1000 && info.executable) {
+    findings.push({
+      category: "Small Program Size",
+      severity: "low",
+      description: "Program bytecode is very small. It might be a proxy pointing to another program.",
+      recommendation: "Verify the proxy destination is trusted.",
+    });
+  }
+  
+  if (!info.executable) {
+    findings.push({
+      category: "Not Executable",
+      severity: "info",
+      description: "This account is not an executable program. It might be a regular account or data account.",
+    });
+  }
+  
+  return {
+    programId,
+    network,
+    executable: info.executable,
+    owner: info.owner,
+    dataSize: info.dataSize,
+    findings,
+    riskScore: findings.reduce((sum, f) => {
+      if (f.severity === "critical") return sum + 25;
+      if (f.severity === "high") return sum + 15;
+      if (f.severity === "medium") return sum + 10;
+      if (f.severity === "low") return sum + 5;
+      return sum + 1;
+    }, 0),
+  };
+}

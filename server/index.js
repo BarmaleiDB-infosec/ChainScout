@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -79,7 +79,7 @@ function scanLimiter(req, res, next) {
 
   if (bucket.count >= rateLimitMax) {
     res.setHeader('Retry-After', String(Math.ceil((rateLimitWindowMs - (now - bucket.startedAt)) / 1000)));
-    res.status(429).json({ ok: false, error: 'Слишком много запросов. Повторите позже.' });
+    res.status(429).json({ ok: false, error: 'РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ Р·Р°РїСЂРѕСЃРѕРІ. РџРѕРІС‚РѕСЂРёС‚Рµ РїРѕР·Р¶Рµ.' });
     return;
   }
 
@@ -90,7 +90,7 @@ function scanLimiter(req, res, next) {
 
 function uploadFileFilter(req, file, cb) {
   if (!/\.(sol|zip|json|txt)$/i.test(file.originalname || '')) {
-    cb(new Error('Поддерживаются только .sol, .zip, .json и .txt файлы'));
+    cb(new Error('РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ .sol, .zip, .json Рё .txt С„Р°Р№Р»С‹'));
     return;
   }
 
@@ -103,7 +103,7 @@ function uploadFileFilter(req, file, cb) {
     'application/octet-stream',
   ];
   if (!allowedMimeTypes.includes(mimeType) && !mimeType.startsWith('text/')) {
-    cb(new Error('Неподдерживаемый content-type для загруженного файла'));
+    cb(new Error('РќРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Р№ content-type РґР»СЏ Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ С„Р°Р№Р»Р°'));
     return;
   }
 
@@ -133,7 +133,7 @@ async function requireAuth(req, res, next) {
   if (!supabaseAdmin) {
     return res.status(500).json({
       ok: false,
-      error: 'Supabase auth не настроен на сервере',
+      error: 'Supabase auth РЅРµ РЅР°СЃС‚СЂРѕРµРЅ РЅР° СЃРµСЂРІРµСЂРµ',
     });
   }
 
@@ -141,7 +141,7 @@ async function requireAuth(req, res, next) {
   if (!authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       ok: false,
-      error: 'Требуется Bearer токен пользователя',
+      error: 'РўСЂРµР±СѓРµС‚СЃСЏ Bearer С‚РѕРєРµРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ',
     });
   }
 
@@ -151,7 +151,7 @@ async function requireAuth(req, res, next) {
     if (error || !data?.user) {
       return res.status(401).json({
         ok: false,
-        error: 'Недействительная пользовательская сессия',
+        error: 'РќРµРґРµР№СЃС‚РІРёС‚РµР»СЊРЅР°СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєР°СЏ СЃРµСЃСЃРёСЏ',
       });
     }
 
@@ -163,7 +163,7 @@ async function requireAuth(req, res, next) {
   } catch (error) {
     return res.status(401).json({
       ok: false,
-      error: 'Не удалось проверить сессию пользователя',
+      error: 'РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРѕРІРµСЂРёС‚СЊ СЃРµСЃСЃРёСЋ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ',
     });
   }
 }
@@ -199,11 +199,11 @@ function validateScanRequest(body, file) {
   const targetUrl = typeof body.targetUrl === 'string' ? body.targetUrl.trim() : '';
 
   if (!file && !targetUrl) {
-    return { error: 'Укажите ссылку или загрузите файл/архив' };
+    return { error: 'РЈРєР°Р¶РёС‚Рµ СЃСЃС‹Р»РєСѓ РёР»Рё Р·Р°РіСЂСѓР·РёС‚Рµ С„Р°Р№Р»/Р°СЂС…РёРІ' };
   }
 
   if (file && !/\.(sol|zip|json|txt)$/i.test(file.originalname)) {
-    return { error: 'Поддерживаются только .sol, .zip, .json и .txt файлы' };
+    return { error: 'РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ .sol, .zip, .json Рё .txt С„Р°Р№Р»С‹' };
   }
 
   return {
@@ -262,7 +262,7 @@ app.get('/api/scans/:id', requireAuth, scanLimiter, (req, res) => {
     return res.status(404).json({ ok: false, error: 'Scan not found' });
   }
   if (req.user?.id && job.payload.userId !== req.user.id) {
-    return res.status(403).json({ ok: false, error: 'Нет доступа к этому scan job' });
+    return res.status(403).json({ ok: false, error: 'РќРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕРјСѓ scan job' });
   }
 
   return res.json({
@@ -277,7 +277,7 @@ app.get('/api/scans/:id/report', requireAuth, scanLimiter, (req, res) => {
     return res.status(404).json({ ok: false, error: 'Scan not found' });
   }
   if (req.user?.id && job.payload.userId !== req.user.id) {
-    return res.status(403).json({ ok: false, error: 'Нет доступа к этому отчёту' });
+    return res.status(403).json({ ok: false, error: 'РќРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕРјСѓ РѕС‚С‡С‘С‚Сѓ' });
   }
   if (!job.report) {
     return res.status(409).json({ ok: false, error: 'Report is not ready yet' });
@@ -372,8 +372,8 @@ app.use((error, req, res, next) => {
     return res.status(400).json({
       ok: false,
       error: error.code === 'LIMIT_FILE_SIZE'
-        ? 'Файл превышает допустимый размер'
-        : 'Ошибка обработки загруженного файла',
+        ? 'Р¤Р°Р№Р» РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјС‹Р№ СЂР°Р·РјРµСЂ'
+        : 'РћС€РёР±РєР° РѕР±СЂР°Р±РѕС‚РєРё Р·Р°РіСЂСѓР¶РµРЅРЅРѕРіРѕ С„Р°Р№Р»Р°',
     });
   }
 
@@ -382,7 +382,7 @@ app.use((error, req, res, next) => {
   }
 
   if (error) {
-    return res.status(400).json({ ok: false, error: error.message || 'Некорректный запрос' });
+    return res.status(400).json({ ok: false, error: error.message || 'РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ Р·Р°РїСЂРѕСЃ' });
   }
 
   next();
@@ -391,3 +391,5 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`ChainScout server listening on ${port}`);
 });
+
+
