@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, ArrowLeft, AlertCircle, Github, Chrome } from "lucide-react";
+import { Shield, ArrowLeft, AlertCircle, Github, Chrome, Loader2, Wallet } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { signUpSchema, signInSchema } from "@/lib/auth-validation";
+import { useWallet } from "@/hooks/useWallet";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +23,8 @@ const Auth = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user, signInWithOAuth, error: authError } = useAuth();
+  const { connect, isConnecting } = useWallet();
+  const [walletLoading, setWalletLoading] = useState<'ethereum' | 'solana' | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -32,7 +35,7 @@ const Auth = () => {
   useEffect(() => {
     if (authError) {
       toast({
-        title: "Authentication Error",
+        title: t('authErrorTitle'),
         description: authError,
         variant: "destructive",
       });
@@ -69,13 +72,13 @@ const Auth = () => {
 
       toast({
         title: t('registrationSuccess'),
-        description: "Check your email for confirmation link.",
+        description: t('checkEmailForConfirmationLink'),
       });
       
       setEmail("");
       setPassword("");
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = error instanceof Error ? error.message : t('unknownError');
       toast({
         title: t('registrationError'),
         description: message,
@@ -112,13 +115,13 @@ const Auth = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "You have signed in successfully.",
+        title: t('successTitle'),
+        description: t('signInSuccess'),
       });
 
       navigate("/dashboard");
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
+      const message = error instanceof Error ? error.message : t('unknownError');
       toast({
         title: t('loginError'),
         description: message,
@@ -138,6 +141,26 @@ const Auth = () => {
     }
   };
 
+  const handleWalletConnect = async (chain: 'ethereum' | 'solana') => {
+    setWalletLoading(chain);
+    try {
+      await connect(chain);
+      toast({
+        title: t('successTitle'),
+        description: t('connecting'),
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t('walletError');
+      toast({
+        title: t('walletError'),
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setWalletLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Back Button */}
@@ -148,7 +171,7 @@ const Auth = () => {
           className="group"
         >
           <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-          На главную
+          {t('backToHome')}
         </Button>
       </div>
 
@@ -230,31 +253,60 @@ const Auth = () => {
                     <div className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-card px-2 text-muted-foreground">{t('orContinueWith')}</span>
                   </div>
                 </div>
 
-                {/* OAuth Buttons */}
+                {/* OAuth / Web3 Buttons */}
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={oauthLoading !== null}
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
                     onClick={() => handleOAuthSignIn('google')}
                     className="w-full"
+                    aria-label="Google"
                   >
                     <Chrome className="w-4 h-4 mr-2" />
-                    {oauthLoading === 'google' ? 'Loading...' : 'Google'}
+                    {oauthLoading === 'google' ? t('loading') : 'Google'}
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
-                    disabled={oauthLoading !== null}
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
                     onClick={() => handleOAuthSignIn('github')}
-                    className="w-full"
+                    className="w-full bg-[#24292e] text-white hover:bg-[#1b1f23] border-transparent"
+                    aria-label={t('connectGitHub')}
                   >
                     <Github className="w-4 h-4 mr-2" />
-                    {oauthLoading === 'github' ? 'Loading...' : 'GitHub'}
+                    {oauthLoading === 'github' ? t('connecting') : t('connectGitHub')}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleWalletConnect('ethereum')}
+                    className="w-full bg-[#627EEA] text-white hover:bg-[#4B65D1]"
+                    aria-label={t('connectEthereum')}
+                  >
+                    {walletLoading === 'ethereum' || isConnecting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wallet className="w-4 h-4 mr-2" />
+                    )}
+                    {walletLoading === 'ethereum' || isConnecting ? t('connecting') : t('connectEthereum')}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleWalletConnect('solana')}
+                    className="w-full text-white bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90"
+                    aria-label={t('connectSolana')}
+                  >
+                    {walletLoading === 'solana' || isConnecting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wallet className="w-4 h-4 mr-2" />
+                    )}
+                    {walletLoading === 'solana' || isConnecting ? t('connecting') : t('connectSolana')}
                   </Button>
                 </div>
               </TabsContent>
@@ -301,7 +353,7 @@ const Auth = () => {
                       </div>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      Минимум 8 символов, заглавная и строчная буквы, цифра
+                      {t('passwordHint')}
                     </p>
                   </div>
                   <Button 

@@ -367,6 +367,147 @@ app.post('/api/analyze', requireAuth, scanLimiter, async (req, res) => {
   }
 });
 
+// ============================================
+// Authentication Routes
+// ============================================
+
+// POST /api/auth/register
+app.post('/api/auth/register', scanLimiter, async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Email and password are required',
+      });
+    }
+
+    if (!supabaseAdmin) {
+      return res.status(500).json({
+        ok: false,
+        error: 'Authentication service not configured on server',
+      });
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: false,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        ok: false,
+        error: error.message || 'Registration failed',
+      });
+    }
+
+    return res.status(201).json({
+      ok: true,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : 'Registration error',
+    });
+  }
+});
+
+// POST /api/auth/login
+app.post('/api/auth/login', scanLimiter, async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Email and password are required',
+      });
+    }
+
+    if (!supabaseAdmin) {
+      return res.status(500).json({
+        ok: false,
+        error: 'Authentication service not configured on server',
+      });
+    }
+
+    const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return res.status(401).json({
+        ok: false,
+        error: error.message || 'Invalid email or password',
+      });
+    }
+
+    return res.json({
+      ok: true,
+      token: data.session?.access_token,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : 'Login error',
+    });
+  }
+});
+
+// POST /api/auth/refresh
+app.post('/api/auth/refresh', scanLimiter, async (req, res) => {
+  try {
+    const { refreshToken } = req.body || {};
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Refresh token is required',
+      });
+    }
+
+    if (!supabaseAdmin) {
+      return res.status(500).json({
+        ok: false,
+        error: 'Authentication service not configured on server',
+      });
+    }
+
+    const { data, error } = await supabaseAdmin.auth.refreshSession({
+      refresh_token: refreshToken,
+    });
+
+    if (error) {
+      return res.status(401).json({
+        ok: false,
+        error: error.message || 'Failed to refresh session',
+      });
+    }
+
+    return res.json({
+      ok: true,
+      token: data.session?.access_token,
+      refreshToken: data.session?.refresh_token,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error instanceof Error ? error.message : 'Refresh error',
+    });
+  }
+});
+
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     return res.status(400).json({

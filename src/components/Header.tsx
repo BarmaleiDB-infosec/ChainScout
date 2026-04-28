@@ -45,11 +45,11 @@ const Header = () => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                     <User className="mr-2 h-4 w-4" />
-                    Dashboard
+                    {t('dashboard')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sign out
+                    {t('signOut')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

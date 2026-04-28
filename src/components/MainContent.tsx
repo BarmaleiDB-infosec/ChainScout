@@ -131,7 +131,7 @@ const MainContent = () => {
               <div className="text-center group cursor-default">
                 <AlertTriangle className="w-16 h-16 mx-auto mb-4 opacity-50 text-cyber-blue transition-all duration-300 group-hover:scale-110 group-hover:opacity-70" />
                 <p className="text-lg text-primary font-semibold transition-colors group-hover:text-primary-glow">{t('noResults')}</p>
-                <p className="text-sm mt-2 text-muted-foreground">Запустите анализ для просмотра результатов</p>
+                <p className="text-sm mt-2 text-muted-foreground">{t('runAnalysisResultsMsg')}</p>
               </div>
             </div>
           </CardContent>

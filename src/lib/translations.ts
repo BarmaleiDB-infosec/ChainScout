@@ -79,6 +79,23 @@ export const translations = {
     registrationError: "Registration failed",
     loginError: "Login failed",
     oauthError: "OAuth login failed",
+
+    // OAuth / Web3
+    connectGitHub: "GitHub",
+    connectEthereum: "Ethereum",
+    connectSolana: "Solana",
+    connecting: "Connecting...",
+    walletError: "Failed to connect wallet",
+
+    // Common UI / Messages
+    backToHome: "Back to home",
+    loading: "Loading...",
+    authErrorTitle: "Authentication Error",
+    successTitle: "Success",
+    signInSuccess: "You have signed in successfully.",
+    checkEmailForConfirmationLink: "Check your email for confirmation link.",
+    unknownError: "Unknown error",
+    passwordHint: "Minimum 8 characters, uppercase and lowercase letters, and a number",
     
     // Subscription
     subscriptionPlans: "Subscription Plans",
@@ -115,7 +132,57 @@ export const translations = {
     // Scanner UI
     chooseType: "Choose analysis type",
     analysisTarget: "Analysis target",
-    analysisDepth: "Scan depth"
+    analysisDepth: "Scan depth",
+
+    // Navigation & Dropdowns
+    dashboard: "Dashboard",
+    signOut: "Sign out",
+    runAnalysisResultsMsg: "Start your first security scan to see detailed vulnerability reports and recommendations.",
+    
+    // Auth Dropdown
+    profile: "Profile",
+    settings: "Settings",
+
+    // Dashboard Page
+    currentPlan: "Current Plan",
+    scansUsed: "Scans Used",
+    upgradeToP: "Upgrade to Pro",
+    unlimited: "Unlimited",
+    securityAnalysesCompleted: "Security analyses completed",
+    backToScanList: "← Back to scan list",
+    scanHistory: "Scan History",
+    securityAnalysisResults: "Security analysis results",
+    noScansYet: "No scans yet",
+    startFirstSecurityAnalysis: "Start your first security analysis",
+    runAnalysis: "Run analysis",
+    apiJob: "API Job",
+    supabaseLabel: "Supabase",
+    vulnerabilitiesLabel: "Vulnerabilities:",
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    completed: "Completed",
+    processing: "Processing",
+    failed: "Failed",
+    pending: "Pending",
+    planFeatures: "Plan Features",
+    manage: "Manage",
+    whatIncluded: "What's included in your plan",
+
+    // ScanResults Component
+    riskAssessment: "Risk Assessment",
+    lowRisk: "Low risk",
+    mediumRisk: "Medium risk",
+    highRisk: "High risk",
+    aiAnalysis: "AI Analysis",
+    criticalRisks: "Critical Risks",
+    remediationCoverage: "Remediation and coverage",
+    remediationOrder: "Remediation order",
+    aiFeedbackLoop: "AI feedback loop",
+    analysisLimitations: "Analysis Limitations",
+    detectedVulnerabilities: "Detected Vulnerabilities",
+    downloadReportBtn: "Download report",
   },
   ru: {
     // Header  
@@ -197,6 +264,23 @@ export const translations = {
     registrationError: "Ошибка регистрации",
     loginError: "Ошибка входа",
     oauthError: "Ошибка OAuth входа",
+
+    // OAuth / Web3
+    connectGitHub: "GitHub",
+    connectEthereum: "Ethereum",
+    connectSolana: "Solana",
+    connecting: "Подключение...",
+    walletError: "Ошибка подключения кошелька",
+
+    // Common UI / Messages
+    backToHome: "На главную",
+    loading: "Загрузка...",
+    authErrorTitle: "Ошибка аутентификации",
+    successTitle: "Успешно",
+    signInSuccess: "Вы успешно вошли.",
+    checkEmailForConfirmationLink: "Проверьте email: мы отправили ссылку для подтверждения.",
+    unknownError: "Неизвестная ошибка",
+    passwordHint: "Минимум 8 символов, заглавная и строчная буквы, цифра",
     
     // Subscription
     subscriptionPlans: "Планы подписки",
@@ -233,9 +317,57 @@ export const translations = {
     // Scanner UI
     chooseType: "Выберите тип анализа",
     analysisTarget: "Цель анализа",
-    analysisDepth: "Глубина анализа"
-  }
-};
+    analysisDepth: "Глубина анализа",
+
+    // Navigation & Dropdowns
+    dashboard: "Панель управления",
+    signOut: "Выйти",
+    runAnalysisResultsMsg: "Начните первое сканирование безопасности, чтобы увидеть подробные отчеты об уязвимостях и рекомендации.",
+
+    // Auth Dropdown
+    profile: "Профиль",
+    settings: "Настройки",
+
+    // Dashboard Page
+    currentPlan: "Текущий план",
+    scansUsed: "Использовано сканирований",
+    upgradeToP: "Обновить до Pro",
+    unlimited: "Неограниченный",
+    securityAnalysesCompleted: "Анализ безопасности завершён",
+    backToScanList: "← Назад к списку",
+    scanHistory: "История сканирований",
+    securityAnalysisResults: "Результаты анализа безопасности",
+    noScansYet: "Пока нет сканирований",
+    startFirstSecurityAnalysis: "Начните первый анализ безопасности",
+    runAnalysis: "Запустить анализ",
+    apiJob: "API Job",
+    supabaseLabel: "Supabase",
+    vulnerabilitiesLabel: "Уязвимостей:",
+    critical: "Критические",
+    high: "Высокие",
+    medium: "Средние",
+    low: "Низкие",
+    completed: "Завершено",
+    processing: "Обработка",
+    failed: "Ошибка",
+    pending: "Ожидание",
+    planFeatures: "Возможности плана",
+    manage: "Управление",
+    whatIncluded: "Что включено в ваш текущий план",
+
+    // ScanResults Component
+    riskAssessment: "Оценка рисков",
+    lowRisk: "Низкий риск",
+    mediumRisk: "Средний риск",
+    highRisk: "Высокий риск",
+    aiAnalysis: "AI Анализ",
+    criticalRisks: "Критичные риски",
+    remediationCoverage: "Remediation и покрытие",
+    remediationOrder: "Порядок фиксов",
+    aiFeedbackLoop: "AI feedback loop",
+    analysisLimitations: "Ограничения анализа",
+    detectedVulnerabilities: "Обнаруженные уязвимости",
+    downloadReportBtn: "Скачать отчет",
 
 export type Language = keyof typeof translations;
-export type TranslationKey = keyof typeof translations.en;
+export type TranslationKey = keyof typeof translations.en | keyof typeof translations.ru;

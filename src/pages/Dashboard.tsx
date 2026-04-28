@@ -153,7 +153,7 @@ const Dashboard = () => {
           {/* Subscription Status */}
           <Card className="border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Current Plan</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('currentPlan')}</CardTitle>
               {subscription?.plan.name === 'Pro' ? (
                 <Crown className="h-4 w-4 text-primary" />
               ) : (
@@ -171,7 +171,7 @@ const Dashboard = () => {
                   size="sm" 
                   className="mt-2"
                 >
-                  Upgrade to Pro
+                  {t('upgradeToP')}
                 </Button>
               )}
             </CardContent>
@@ -180,7 +180,7 @@ const Dashboard = () => {
           {/* Scans Used */}
           <Card className="border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Scans Used</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('scansUsed')}</CardTitle>
               <Zap className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -192,7 +192,7 @@ const Dashboard = () => {
               </div>
               <Progress value={usagePercentage} className="mt-2" />
               <p className="text-xs text-muted-foreground mt-1">
-                {remainingScans === Infinity ? 'Unlimited' : `${remainingScans} remaining`}
+                {remainingScans === Infinity ? t('unlimited') : `${remainingScans} ${t('remaining')}`}
               </p>
             </CardContent>
           </Card>
@@ -200,13 +200,13 @@ const Dashboard = () => {
           {/* Total Reports */}
           <Card className="border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Scans</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('totalScans')}</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{recentScans.length}</div>
               <p className="text-xs text-muted-foreground">
-                Security analyses completed
+                {t('securityAnalysesCompleted')}
               </p>
             </CardContent>
           </Card>
@@ -222,7 +222,7 @@ const Dashboard = () => {
                 onClick={() => setSelectedScan(null)}
                 className="mb-4"
               >
-                ← Назад к списку
+                {t('backToScanList')}
               </Button>
               <ScanResults scan={selectedScan} />
             </div>
@@ -230,18 +230,18 @@ const Dashboard = () => {
             <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  История сканирований
+                  {t('scanHistory')}
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => navigate('/')}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Новый скан
+                    {t('newScan')}
                   </Button>
                 </CardTitle>
                 <CardDescription>
-                  Результаты анализа безопасности
+                  {t('securityAnalysisResults')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -252,13 +252,13 @@ const Dashboard = () => {
                 ) : recentScans.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Пока нет сканирований</p>
-                    <p className="text-sm">Начните первый анализ безопасности</p>
+                    <p>{t('noScansYet')}</p>
+                    <p className="text-sm">{t('startFirstSecurityAnalysis')}</p>
                     <Button 
                       onClick={() => navigate('/')}
                       className="mt-4"
                     >
-                      Запустить анализ
+                      {t('runAnalysis')}
                     </Button>
                   </div>
                 ) : (
@@ -283,19 +283,19 @@ const Dashboard = () => {
                               </div>
                               {scan.results?.summary && (
                                 <div className="flex items-center gap-2 text-sm mt-2">
-                                  <span className="text-muted-foreground">Уязвимостей:</span>
+                                  <span className="text-muted-foreground">{t('vulnerabilitiesLabel')}</span>
                                   {scan.results?.vulnerabilities?.critical && scan.results.vulnerabilities.critical > 0 && (
                                     <Badge variant="destructive" className="text-xs">
-                                      {scan.results.vulnerabilities.critical} критичных
+                                      {scan.results.vulnerabilities.critical} {t('critical')}
                                     </Badge>
                                   )}
                                   {scan.results?.vulnerabilities?.high && scan.results.vulnerabilities.high > 0 && (
                                     <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-500">
-                                      {scan.results.vulnerabilities.high} высоких
+                                      {scan.results.vulnerabilities.high} {t('high')}
                                     </Badge>
                                   )}
                                   <span className="text-muted-foreground">
-                                    Риск: {scan.results?.summary?.riskScore || 0}/100
+                                    Risk: {scan.results?.summary?.riskScore || 0}/100
                                   </span>
                                 </div>
                               )}
@@ -303,9 +303,9 @@ const Dashboard = () => {
                             <Badge 
                               variant={scan.status === 'completed' ? 'default' : scan.status === 'failed' ? 'destructive' : 'secondary'}
                             >
-                              {scan.status === 'completed' ? 'Завершено' : 
-                               scan.status === 'processing' || scan.status === 'running' ? 'Обработка' :
-                               scan.status === 'failed' ? 'Ошибка' : 'Ожидание'}
+                              {scan.status === 'completed' ? t('completed') : 
+                               scan.status === 'processing' || scan.status === 'running' ? t('processing') :
+                               scan.status === 'failed' ? t('failed') : t('pending')}
                             </Badge>
                           </div>
                         </CardContent>
@@ -322,18 +322,18 @@ const Dashboard = () => {
             <Card className="border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  Возможности плана
+                  {t('planFeatures')}
                   <Button 
                     size="sm" 
                     variant="outline"
                     onClick={() => setShowSubscriptionModal(true)}
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    Управление
+                    {t('manage')}
                   </Button>
                 </CardTitle>
                 <CardDescription>
-                  Что включено в ваш текущий план
+                  {t('whatIncluded')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">

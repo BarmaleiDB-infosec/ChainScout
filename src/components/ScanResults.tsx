@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle, Info, XCircle, Download, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Finding {
   id: string;
@@ -53,6 +54,7 @@ interface ScanResultsProps {
 
 const ScanResults = ({ scan }: ScanResultsProps) => {
   const { results, ai_analysis } = scan;
+  const { t } = useTranslation();
 
   if (!results) return null;
 
@@ -135,7 +137,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
       {/* Risk Score */}
       <Card className="glow-card">
         <CardHeader>
-          <CardTitle>Оценка рисков</CardTitle>
+          <CardTitle>{t('riskAssessment')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
@@ -150,9 +152,9 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
                 />
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                {resultsData.summary && resultsData.summary.riskScore < 30 && "Низкий риск"}
-                {resultsData.summary && resultsData.summary.riskScore >= 30 && resultsData.summary.riskScore < 70 && "Средний риск"}
-                {resultsData.summary && resultsData.summary.riskScore >= 70 && "Высокий риск"}
+                {resultsData.summary && resultsData.summary.riskScore < 30 && t('lowRisk')}
+                {resultsData.summary && resultsData.summary.riskScore >= 30 && resultsData.summary.riskScore < 70 && t('mediumRisk')}
+                {resultsData.summary && resultsData.summary.riskScore >= 70 && t('highRisk')}
               </p>
             </div>
           </div>
@@ -165,7 +167,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="w-6 h-6 text-primary" />
-              AI Анализ
+              {t('aiAnalysis')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -174,7 +176,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
             </div>
             {criticalRisks.length > 0 && (
               <div className="mt-6 space-y-3">
-                <h4 className="font-semibold">Критичные риски</h4>
+                <h4 className="font-semibold">{t('criticalRisks')}</h4>
                 {criticalRisks.map((risk, index) => (
                   <div key={`${risk.title}-${index}`} className="rounded-lg border border-border/50 p-3">
                     <div className="flex items-center justify-between gap-3">
@@ -195,12 +197,12 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
       {(remediationRoadmap.length > 0 || trainingSignals.length > 0 || limitations.length > 0) && (
         <Card className="glow-card">
           <CardHeader>
-            <CardTitle>Remediation и покрытие</CardTitle>
+            <CardTitle>{t('remediationCoverage')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {remediationRoadmap.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-3">Порядок фиксов</h4>
+                <h4 className="font-semibold mb-3">{t('remediationOrder')}</h4>
                 <div className="space-y-2">
                   {remediationRoadmap.map((step, index) => (
                     <div key={`${step}-${index}`} className="rounded-lg bg-muted/40 p-3 text-sm">
@@ -226,7 +228,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
 
             {limitations.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-3">Ограничения анализа</h4>
+                <h4 className="font-semibold mb-3">{t('analysisLimitations')}</h4>
                 <div className="space-y-2">
                   {limitations.map((limitation, index) => (
                     <p key={`${limitation}-${index}`} className="text-sm text-muted-foreground">
@@ -243,10 +245,10 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
       {/* Findings */}
       <Card className="glow-card">
     <CardHeader className="flex flex-row items-center justify-between">
-      <CardTitle>Обнаруженные уязвимости ({resultsData.findings?.length || 0})</CardTitle>
+      <CardTitle>{t('detectedVulnerabilities')} ({resultsData.findings?.length || 0})</CardTitle>
           <Button onClick={handleDownloadReport} variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            Скачать отчет
+            {t('downloadReportBtn')}
           </Button>
         </CardHeader>
         <CardContent>
