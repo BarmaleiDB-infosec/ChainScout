@@ -364,6 +364,69 @@ const Auth = () => {
                     {loading ? t('signingUp') : t('signUp')}
                   </Button>
                 </form>
+
+                {/* OAuth Divider */}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">{t('orContinueWith')}</span>
+                  </div>
+                </div>
+
+                {/* OAuth / Web3 Buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleOAuthSignIn('google')}
+                    className="w-full"
+                    aria-label="Google"
+                  >
+                    <Chrome className="w-4 h-4 mr-2" />
+                    {oauthLoading === 'google' ? t('loading') : 'Google'}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleOAuthSignIn('github')}
+                    className="w-full bg-[#24292e] text-white hover:bg-[#1b1f23] border-transparent"
+                    aria-label={t('connectGitHub')}
+                  >
+                    <Github className="w-4 h-4 mr-2" />
+                    {oauthLoading === 'github' ? t('connecting') : t('connectGitHub')}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleWalletConnect('ethereum')}
+                    className="w-full bg-[#627EEA] text-white hover:bg-[#4B65D1]"
+                    aria-label={t('connectEthereum')}
+                  >
+                    {walletLoading === 'ethereum' || isConnecting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wallet className="w-4 h-4 mr-2" />
+                    )}
+                    {walletLoading === 'ethereum' || isConnecting ? t('connecting') : t('connectEthereum')}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={oauthLoading !== null || loading || isConnecting || walletLoading !== null}
+                    onClick={() => handleWalletConnect('solana')}
+                    className="w-full text-white bg-gradient-to-r from-[#9945FF] to-[#14F195] hover:opacity-90"
+                    aria-label={t('connectSolana')}
+                  >
+                    {walletLoading === 'solana' || isConnecting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Wallet className="w-4 h-4 mr-2" />
+                    )}
+                    {walletLoading === 'solana' || isConnecting ? t('connecting') : t('connectSolana')}
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>

@@ -390,10 +390,9 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
       });
     }
 
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const { data, error } = await supabaseAdmin.auth.signUp({
       email,
       password,
-      email_confirm: false,
     });
 
     if (error) {
@@ -405,10 +404,8 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
 
     return res.status(201).json({
       ok: true,
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-      },
+      user: data.user,
+      session: data.session,
     });
   } catch (error) {
     return res.status(500).json({
