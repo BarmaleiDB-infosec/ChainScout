@@ -390,10 +390,15 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
       });
     }
 
-    const { data, error } = await supabaseAdmin.auth.signUp({
+    const createUserPayload = {
       email,
       password,
-    });
+      email_confirm: true,
+    };
+
+    const { data, error } = await (supabaseAdmin.auth.admin && typeof supabaseAdmin.auth.admin.createUser === 'function'
+      ? supabaseAdmin.auth.admin.createUser(createUserPayload)
+      : supabaseAdmin.auth.signUp({ email, password }));
 
     if (error) {
       return res.status(400).json({
@@ -405,7 +410,6 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
     return res.status(201).json({
       ok: true,
       user: data.user,
-      session: data.session,
     });
   } catch (error) {
     return res.status(500).json({

@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export type ScanTargetType =
   | "github_repo"

@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { signUpSchema, signInSchema } from "@/lib/auth-validation";
 import { useWallet } from "@/hooks/useWallet";
+import { registerUser, loginUser } from "@/lib/api";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -60,15 +61,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
+      await registerUser(email, password);
 
       toast({
         title: t('registrationSuccess'),
@@ -107,12 +100,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
+      const data = await loginUser(email, password);
+      
+      // Сохраняем токен
+      localStorage.setItem('access_token', data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem('refresh_token', data.refresh_token);
+      }
 
       toast({
         title: t('successTitle'),
