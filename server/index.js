@@ -221,34 +221,39 @@ function validateScanRequest(body, file) {
 
 async function processScan(jobId) {
   const job = getScanJob(jobId);
-  if (!job) {
-    return;
-  }
+  if (!job) return;
 
   updateScanJob(jobId, { status: 'running', progress: 15 });
 
   try {
     const report = await runAnalysis(job.payload);
-    updateScanJob(jobId, {
-      status: 'completed',
-      progress: 100,
-      report,
-      error: null,
-    });
+    
+    // Сохранить в Supabase
+    const { error: dbError } = await supabaseAdmin
+      .from('scans')
+      .insert({
+        id: jobId,
+        user_id: job.payload.userId,
+        target_type: job.payload.targetType,
+        target_url: job.payload.targetUrl,
+        status: 'completed',
+        risk_score: report?.summary?.riskScore || 0,
+        vulnerabilities: report?.findings || [],
+        report: report || {},
+        created_at: new Date().toISOString(),
+      });
+    
+    if (dbError) console.warn('Supabase insert error:', dbError.message);
+    
+    updateScanJob(jobId, { status: 'completed', progress: 100, report, error: null });
   } catch (error) {
-    updateScanJob(jobId, {
-      status: 'failed',
-      progress: 100,
-      error: error && error.message ? error.message : 'Analysis failed',
-      report: null,
-    });
+    updateScanJob(jobId, { status: 'failed', progress: 100, error: error?.message || 'Analysis failed', report: null });
   } finally {
     if (job.payload.uploadedFilePath) {
       fs.rm(job.payload.uploadedFilePath, { force: true }, () => {});
     }
   }
 }
-
 app.get('/api/scans/recent', requireAuth, scanLimiter, async (req, res) => {
   try {
     const { data: scans, error } = await supabaseAdmin
