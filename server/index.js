@@ -552,6 +552,23 @@ app.post("/api/solana/scan", requireAuth, scanLimiter, async (req, res) => {
       return res.status(400).json({ ok: false, error: "Invalid Solana program address" });
     }
     const result = await analyzeSolanaProgram(programId, network);
+    
+    const report = {
+      target: { type: "solana_program", url: programId, network },
+      summary: {
+        riskScore: result.riskScore,
+        totalFindings: result.findings.length,
+        severityBreakdown: {
+          critical: result.findings.filter(f => f.severity === "critical").length,
+          high: result.findings.filter(f => f.severity === "high").length,
+          medium: result.findings.filter(f => f.severity === "medium").length,
+          low: result.findings.filter(f => f.severity === "low").length,
+          info: result.findings.filter(f => f.severity === "info").length,
+        },
+      },
+      findings: result.findings,
+    };
+    
     const { data: scan, error } = await supabaseAdmin
       .from("scans")
       .insert({
@@ -561,19 +578,15 @@ app.post("/api/solana/scan", requireAuth, scanLimiter, async (req, res) => {
         status: "completed",
         risk_score: result.riskScore,
         vulnerabilities: result.findings,
-        report_text: `Solana program analysis: ${result.findings.length} findings`,
+        report: report,
       })
       .select()
       .single();
+    
     if (error) throw error;
     res.json({ ok: true, scan, result });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
 });
-
-app.listen(port, () => {
-  console.log(`ChainScout server listening on ${port}`);
-});
-
 
