@@ -5,10 +5,10 @@
 
 const axios = require('axios');
 
-const ETHERSCAN_API_URL = 'https://api.etherscan.io/api';
+const ETHERSCAN_API_URL = 'https://api.etherscan.io/v2/api';
 const ETHERSCAN_TESTNET_URLS = {
-  sepolia: 'https://api-sepolia.etherscan.io/api',
-  goerli: 'https://api-goerli.etherscan.io/api',
+  sepolia: 'https://api-sepolia.etherscan.io/v2/api',
+  goerli: 'https://api-goerli.etherscan.io/v2/api',
 };
 
 /**
@@ -46,6 +46,7 @@ async function getContractSourceCode(address, chain = 'mainnet') {
 
 	const result = response.data?.result?.[0] || {};    
     // Enhanced error handling for unverified contracts
+    console.log("DEBUG SourceCode length:", result.SourceCode?.length, "type:", typeof result.SourceCode);
     if (!result) {
       throw new Error(
         `Contract ${normalizedAddress} not found on ${chain}. ` +
