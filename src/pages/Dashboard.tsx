@@ -29,7 +29,7 @@ const Dashboard = () => {
   const [selectedScan, setSelectedScan] = useState<DashboardScan | null>(null);
   const [loadingScans, setLoadingScans] = useState(true);
 
-  const loadRecentScans = useCallback(async () => {
+  const loadRecentScans = async () => {
     try {
       const apiScans = await listRecentApiScans().catch(() => [] as ScanJob[]);
 
@@ -79,7 +79,7 @@ const Dashboard = () => {
     if (localStorage.getItem("access_token")) {
       loadRecentScans();
     }
-  }, [loadRecentScans]);
+  }, []);
 
   if (loadingScans) {
     return (
