@@ -265,37 +265,47 @@ app.get('/api/scans/recent', requireAuth, scanLimiter, async (req, res) => {
   }
 });
 
-app.get('/api/scans/:id', requireAuth, scanLimiter, (req, res) => {
-  const job = getScanJob(req.params.id);
-  if (!job) {
-    return res.status(404).json({ ok: false, error: 'Scan not found' });
+app.get('/api/scans/:id', requireAuth, scanLimiter, async (req, res) => {
+  try {
+    const { data: scan, error } = await supabaseAdmin
+      .from('scans')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+    
+    if (error || !scan) {
+      return res.status(404).json({ ok: false, error: 'Scan not found' });
+    }
+    if (req.user?.id && scan.user_id !== req.user.id) {
+      return res.status(403).json({ ok: false, error: 'Access denied' });
+    }
+    res.json({ ok: true, scan });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
   }
-  if (req.user?.id && job.payload.userId !== req.user.id) {
-    return res.status(403).json({ ok: false, error: 'РќРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕРјСѓ scan job' });
-  }
-
-  return res.json({
-    ok: true,
-    scan: toPublicScan(job),
-  });
 });
 
-app.get('/api/scans/:id/report', requireAuth, scanLimiter, (req, res) => {
-  const job = getScanJob(req.params.id);
-  if (!job) {
-    return res.status(404).json({ ok: false, error: 'Scan not found' });
+app.get('/api/scans/:id/report', requireAuth, scanLimiter, async (req, res) => {
+  try {
+    const { data: scan, error } = await supabaseAdmin
+      .from('scans')
+      .select('*')
+      .eq('id', req.params.id)
+      .single();
+    
+    if (error || !scan) {
+      return res.status(404).json({ ok: false, error: 'Scan not found' });
+    }
+    if (req.user?.id && scan.user_id !== req.user.id) {
+      return res.status(403).json({ ok: false, error: 'Access denied' });
+    }
+    if (!scan.report) {
+      return res.status(409).json({ ok: false, error: 'Report is not ready yet' });
+    }
+    res.json({ ok: true, report: scan.report });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
   }
-  if (req.user?.id && job.payload.userId !== req.user.id) {
-    return res.status(403).json({ ok: false, error: 'РќРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕРјСѓ РѕС‚С‡С‘С‚Сѓ' });
-  }
-  if (!job.report) {
-    return res.status(409).json({ ok: false, error: 'Report is not ready yet' });
-  }
-
-  return res.json({
-    ok: true,
-    report: job.report,
-  });
 });
 
 app.post('/api/scans', requireAuth, scanLimiter, upload.single('file'), async (req, res) => {
