@@ -122,7 +122,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            {t('welcomeBack')}, {user?.email?.split('@')[0]}!
+            {t('welcomeBack')}, {localStorage.getItem('user_email')?.split('@')[0] || ''}!
           </h1>
           <p className="text-muted-foreground">
             {t('monitorSecurity')}
