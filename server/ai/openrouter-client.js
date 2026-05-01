@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_ENDPOINT = process.env.OPENROUTER_ENDPOINT || 'https://api.openrouter.ai/v1/chat/completions';
+const OPENROUTER_ENDPOINT = process.env.OPENROUTER_ENDPOINT || 'https://openrouter.ai/api/v1/chat/completions';
 
 function requireOpenRouterKey() {
   if (!OPENROUTER_API_KEY) {
