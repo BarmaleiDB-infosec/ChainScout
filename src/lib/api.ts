@@ -92,14 +92,10 @@ async function parseApiResponse<T>(response: Response): Promise<T> {
 
 async function buildAuthHeaders(baseHeaders?: HeadersInit): Promise<Headers> {
   const headers = new Headers(baseHeaders || {});
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session?.access_token) {
-    headers.set("Authorization", `Bearer ${session.access_token}`);
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
-
   return headers;
 }
 
