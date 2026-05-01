@@ -53,7 +53,6 @@ export const translations = {
   welcomeBack: "Welcome back",
   monitorSecurity: "Monitor your security scans and stay on top of your security posture",
   newScan: "New Scan",
-  integrations: "Integrations",
   remaining: "remaining",
     
     // Auth
@@ -75,7 +74,6 @@ export const translations = {
     oauthError: "OAuth login failed",
 
     // OAuth / Web3
-    connectGitHub: "GitHub",
     connectEthereum: "Ethereum",
     connectSolana: "Solana",
     connecting: "Connecting...",
@@ -171,7 +169,6 @@ export const translations = {
     staticCodeAnalysis: "Static code analysis",
     vulnerabilitySearch: "Smart contract vulnerability search",
     web3Audit: "Web3 project audit",
-    gitIntegrations: "GitHub/GitLab integrations",
     automatedTests: "Automated security tests",
     realtimeMonitoring: "Real-time monitoring",
 
@@ -285,7 +282,6 @@ export const translations = {
   welcomeBack: "С возвращением",
   monitorSecurity: "Отслеживайте ваши сканирования безопасности и управляйте подпиской",
   newScan: "Новый скан",
-  integrations: "Интеграции",
   remaining: "оставшиеся",
     
     // Auth
@@ -307,7 +303,6 @@ export const translations = {
     oauthError: "Ошибка OAuth входа",
 
     // OAuth / Web3
-    connectGitHub: "GitHub",
     connectEthereum: "Ethereum",
     connectSolana: "Solana",
     connecting: "Подключение...",
@@ -403,7 +398,6 @@ export const translations = {
     staticCodeAnalysis: "Статический анализ кода",
     vulnerabilitySearch: "Поиск уязвимостей в смарт-контрактах",
     web3Audit: "Аудит Web3 проектов",
-    gitIntegrations: "Интеграции с GitHub/GitLab",
     automatedTests: "Автоматизированные тесты безопасности",
     realtimeMonitoring: "Мониторинг в реальном времени",
 

@@ -11,7 +11,6 @@ import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Documentation from "./pages/Documentation";
 import Education from "./pages/Education";
-import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -32,11 +31,6 @@ const App = () => (
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/integrations" element={
-                <ProtectedRoute>
-                  <Integrations />
                 </ProtectedRoute>
               } />
               <Route path="/docs" element={<Documentation />} />

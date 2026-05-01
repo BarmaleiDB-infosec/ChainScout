@@ -29,7 +29,7 @@ const Dashboard = () => {
   const [selectedScan, setSelectedScan] = useState<DashboardScan | null>(null);
   const [loadingScans, setLoadingScans] = useState(true);
 
-  const loadRecentScans = async () => {
+  const loadRecentScans = useCallback(async () => {
     try {
       const apiScans = await listRecentApiScans().catch(() => [] as ScanJob[]);
 
