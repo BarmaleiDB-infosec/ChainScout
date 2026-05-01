@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { createScan, pollScan, type CreateScanRequest, type ScanJob, type ScanTargetType } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Bot, FileArchive, FileCode, FileText, GitBranch, Globe, Loader2, Shield, Upload, Wallet, Zap } from "lucide-react";
+import { Bot, FileText, Globe, Loader2, Shield, Wallet, Zap } from "lucide-react";
 
 const targetTypes: Array<{
   id: ScanTargetType;
@@ -19,41 +19,25 @@ const targetTypes: Array<{
   acceptsFile?: boolean;
 }> = [
   {
-    id: "github_repo",
-    label: "Репозиторий",
-    description: "GitHub репозиторий смарт-контрактов или web3 приложения",
-    icon: GitBranch,
-    placeholder: "https://github.com/user/repo",
-  },
-  {
     id: "contract_address",
-    label: "Смарт-контракт",
-    description: "Адрес контракта для анализа через explorer source + security checks",
+    label: "Smart Contract",
+    description: "Contract address for analysis via explorer source and security checks",
     icon: Wallet,
     placeholder: "0x742d35Cc6634C0532925a3b8D4C9db96590b5aF3",
   },
   {
-    id: "website_url",
-    label: "Web3 сайт",
-    description: "Быстрый браузерный анализ dApp URL и wallet surface",
+    id: "solana_program",
+    label: "Solana Program",
+    description: "Solana program ID for on-chain program security analysis",
+    icon: Zap,
+    placeholder: "Enter Solana program ID",
+  },
+  {
+    id: "web3_project",
+    label: "DApp / Web3 Project",
+    description: "URL of a Web3 project or decentralized app for security review",
     icon: Globe,
     placeholder: "https://app.example.xyz",
-  },
-  {
-    id: "zip_upload",
-    label: "ZIP архив",
-    description: "Загрузка проекта прямо в браузере без git clone со стороны пользователя",
-    icon: FileArchive,
-    placeholder: "Загрузите .zip архив проекта",
-    acceptsFile: true,
-  },
-  {
-    id: "file_upload",
-    label: "Файл контракта",
-    description: "Одиночный .sol файл или JSON-артефакт для сканирования",
-    icon: FileCode,
-    placeholder: "Загрузите .sol или .json файл",
-    acceptsFile: true,
   },
 ];
 
@@ -66,7 +50,7 @@ const ScannerSelector = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedTarget, setSelectedTarget] = useState<ScanTargetType>("github_repo");
+  const [selectedTarget, setSelectedTarget] = useState<ScanTargetType>("contract_address");
   const [scanLevel, setScanLevel] = useState("comprehensive");
   const [targetUrl, setTargetUrl] = useState("");
   const [isPrefilledUrl, setIsPrefilledUrl] = useState(false);
@@ -116,7 +100,7 @@ const ScannerSelector = () => {
     if (!selectedTypeConfig?.acceptsFile && !targetUrl.trim()) {
       toast({
         title: "Нужна ссылка",
-        description: "Введите URL репозитория, адрес контракта или web3 сайта.",
+        description: "Введите адрес смарт-контракта, ID Solana-программы или URL dApp.",
         variant: "destructive",
       });
       return;
@@ -179,7 +163,7 @@ const ScannerSelector = () => {
               Сканер безопасности прямо в браузере
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Вставьте ссылку на репозиторий, адрес контракта или загрузите файл. ChainScout прогонит артефакт через security pipeline и соберёт AI-отчёт с уязвимостями, severity и рекомендациями.
+              Вставьте адрес контракта, ID Solana-программы или URL dApp. ChainScout прогонит артефакт через security pipeline и соберёт AI-отчёт с уязвимостями, severity и рекомендациями.
             </p>
           </div>
 
@@ -226,7 +210,7 @@ const ScannerSelector = () => {
                     <div className="rounded-xl border border-dashed border-primary/40 bg-background/40 p-4">
                       <Input
                         type="file"
-                        accept={selectedTarget === "zip_upload" ? ".zip" : ".sol,.json,.txt"}
+                        accept=".sol,.json,.txt"
                         onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
                         disabled={isScanning}
                         className="bg-transparent"

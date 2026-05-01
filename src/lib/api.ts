@@ -3,12 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export type ScanTargetType =
-  | "github_repo"
   | "contract_address"
-  | "website_url"
-  | "web3_project"
-  | "file_upload"
-  | "zip_upload";
+  | "solana_program"
+  | "web3_project";
 
 export type ScanStatus = "queued" | "running" | "completed" | "failed";
 

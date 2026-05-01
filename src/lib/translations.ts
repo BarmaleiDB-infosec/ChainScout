@@ -22,7 +22,6 @@ export const translations = {
     // Target Types
     website: "Website",
     smartContract: "Smart Contract",
-    repository: "Repository",
     blockchain: "Blockchain",
     dapp: "DApp",
     defi: "DeFi Protocol",
@@ -46,10 +45,6 @@ export const translations = {
     noResults: "No analysis results yet. Start your first security scan to see detailed vulnerability reports and recommendations.",
     noReports: "No reports available yet. Complete a security analysis to generate detailed PDF reports.",
     vulnerabilities: "Vulnerabilities",
-    critical: "Critical",
-    high: "High",
-    medium: "Medium",
-    low: "Low",
     
     // Analytics
     totalScans: "Total Scans",
@@ -59,7 +54,6 @@ export const translations = {
   monitorSecurity: "Monitor your security scans and manage your subscription",
   newScan: "New Scan",
   integrations: "Integrations",
-  scansUsed: "Scans Used",
   remaining: "remaining",
     
     // Auth
@@ -101,7 +95,6 @@ export const translations = {
     subscriptionPlans: "Subscription Plans",
     choosePlan: "Choose the perfect plan for your security needs",
     popular: "Popular",
-    currentPlan: "Current Plan",
     selectPlan: "Select Plan",
     freePlan: "Free Plan",
     proPlan: "Pro Plan",
@@ -117,11 +110,7 @@ export const translations = {
     support: "Support",
     
     // Scanner Target Types Descriptions
-    repoDescription: "GitHub repository of smart contracts or web3 application",
     contractDescription: "Contract address for analysis via explorer source + security checks",
-    websiteDescription: "Fast browser analysis of dApp URL and wallet surface",
-    zipDescription: "Upload project directly in browser without git clone from user side",
-    fileDescription: "Single .sol file or JSON artifact for scanning",
     
     // Scanner Levels Descriptions
     passiveDescription: "Fast surface-level analysis",
@@ -184,41 +173,10 @@ export const translations = {
     detectedVulnerabilities: "Detected Vulnerabilities",
     downloadReportBtn: "Download report",
 
-    // ScannerSelector Component
-    scannerBrowserTitle: "Browser-based Security Scanner",
-    targetDescription: "Submit repository link, contract address, or upload a file. ChainScout runs it through the security pipeline and generates an AI report with vulnerabilities, severity, and recommendations.",
-    source: "Source",
-    repository: "Repository",
-    smartContract: "Smart Contract",
-    web3Site: "Web3 Site",
-    zipArchive: "ZIP Archive",
-    fileContract: "Contract File",
-    repoPlaceholder: "https://github.com/user/repo",
-    contractPlaceholder: "0x742d35Cc6634C0532925a3b8D4C9db96590b5aF3",
-    websitePlaceholder: "https://app.example.xyz",
-    zipPlaceholder: "Upload .zip archive",
-    filePlaceholder: "Upload .sol or .json file",
-    standard: "Standard",
-    comprehensive: "Comprehensive + AI",
-    balancedAnalysis: "Balanced analysis",
-    mostDetailedReport: "Most detailed report",
-    runScan: "Run Scan",
-    needFile: "File needed",
-    uploadFileForMode: "Upload a file or archive for the selected analysis mode.",
-    needLink: "Link needed",
-    enterUrlForMode: "Enter URL, contract address, or website.",
-    scanStarting: "Scan job starting",
-    preparingArtifacts: "Preparing artifacts and selecting analysis engine.",
-    scanCompleted: "Scan completed",
-    detailedReportAvailable: "Detailed report now available on dashboard.",
-    analysisError: "Analysis error",
-    couldNotCompleteScan: "Could not complete scan",
-
     // Features Component
     howItWorks: "How it works",
     threeSimpleSteps: "Three simple steps to complete security analysis of your project",
     connect: "Connect your project",
-    uploadRepo: "Upload repository or connect via GitHub/GitLab",
     startAnalysis_: "Start analysis",
     aiAutomaticSelects: "AI automatically selects and runs optimal tools",
     getReport: "Get report",
@@ -235,7 +193,6 @@ export const translations = {
     // Documentation
     apiDocumentation: "API Documentation",
     fullIntegrationGuide: "Complete guide to integrating ChainScout API and SDK into your projects",
-    api: "API",
     sdk: "SDK",
     webhooks: "Webhooks",
     guides: "Guides",
@@ -312,7 +269,6 @@ export const translations = {
     // Target Types
     website: "Веб-сайт",
     smartContract: "Смарт-контракт",
-    repository: "Репозиторий",
     blockchain: "Блокчейн",
     dapp: "DApp",
     defi: "DeFi протокол",
@@ -336,10 +292,6 @@ export const translations = {
     noResults: "Пока нет результатов анализа. Начните первое сканирование безопасности, чтобы увидеть подробные отчеты об уязвимостях и рекомендации.",
     noReports: "Пока нет отчетов. Завершите анализ безопасности, чтобы сгенерировать подробные PDF отчеты.",
     vulnerabilities: "Уязвимости",
-    critical: "Критические",
-    high: "Высокие",
-    medium: "Средние",
-    low: "Низкие",
     
     // Analytics
     totalScans: "Всего сканирований",
@@ -349,7 +301,6 @@ export const translations = {
   monitorSecurity: "Отслеживайте ваши сканирования безопасности и управляйте подпиской",
   newScan: "Новый скан",
   integrations: "Интеграции",
-  scansUsed: "Использовано сканирований",
   remaining: "оставшиеся",
     
     // Auth
@@ -391,7 +342,6 @@ export const translations = {
     subscriptionPlans: "Планы подписки",
     choosePlan: "Выберите идеальный план для ваших потребностей в безопасности",
     popular: "Популярный",
-    currentPlan: "Текущий план",
     selectPlan: "Выбрать план",
     freePlan: "Бесплатный план",
     proPlan: "Pro версия",
@@ -407,11 +357,7 @@ export const translations = {
     support: "Поддержка",
     
     // Scanner Target Types Descriptions
-    repoDescription: "GitHub репозиторий смарт-контрактов или web3 приложения",
     contractDescription: "Адрес контракта для анализа через explorer source + security checks",
-    websiteDescription: "Быстрый браузерный анализ dApp URL и wallet surface",
-    zipDescription: "Загрузка проекта прямо в браузере без git clone со стороны пользователя",
-    fileDescription: "Одиночный .sol файл или JSON-артефакт для сканирования",
     
     // Scanner Levels Descriptions
     passiveDescription: "Быстрый поверхностный анализ",
@@ -474,41 +420,10 @@ export const translations = {
     detectedVulnerabilities: "Обнаруженные уязвимости",
     downloadReportBtn: "Скачать отчет",
 
-    // ScannerSelector Component
-    scannerBrowserTitle: "Сканер безопасности прямо в браузере",
-    targetDescription: "Вставьте ссылку на репозиторий, адрес контракта или загрузите файл. ChainScout прогонит артефакт через security pipeline и соберёт AI-отчёт с уязвимостями, severity и рекомендациями.",
-    source: "Источник",
-    repository: "Репозиторий",
-    smartContract: "Смарт-контракт",
-    web3Site: "Web3 сайт",
-    zipArchive: "ZIP архив",
-    fileContract: "Файл контракта",
-    repoPlaceholder: "https://github.com/user/repo",
-    contractPlaceholder: "0x742d35Cc6634C0532925a3b8D4C9db96590b5aF3",
-    websitePlaceholder: "https://app.example.xyz",
-    zipPlaceholder: "Загрузите .zip архив проекта",
-    filePlaceholder: "Загрузите .sol или .json файл",
-    standard: "Стандартный",
-    comprehensive: "Полный + AI",
-    balancedAnalysis: "Сбалансированный анализ",
-    mostDetailedReport: "Максимально подробный отчёт",
-    runScan: "Запустить сканирование",
-    needFile: "Нужен файл",
-    uploadFileForMode: "Загрузите файл или архив для выбранного режима анализа.",
-    needLink: "Нужна ссылка",
-    enterUrlForMode: "Введите URL репозитория, адрес контракта или web3 сайта.",
-    scanStarting: "Запускаем scan job",
-    preparingArtifacts: "Готовим артефакты и подбираем движок анализа.",
-    scanCompleted: "Сканирование завершено",
-    detailedReportAvailable: "Подробный отчёт уже доступен на дашборде.",
-    analysisError: "Ошибка анализа",
-    couldNotCompleteScan: "Не удалось завершить сканирование",
-
     // Features Component
     howItWorks: "Как это работает",
     threeSimpleSteps: "Три простых шага до полного анализа безопасности вашего проекта",
     connect: "Подключите проект",
-    uploadRepo: "Загрузите репозиторий или подключите через GitHub/GitLab",
     startAnalysis_: "Запустите анализ",
     aiAutomaticSelects: "ИИ автоматически подбирает и запускает оптимальные инструменты",
     getReport: "Получите отчёт",
@@ -525,7 +440,6 @@ export const translations = {
     // Documentation
     apiDocumentation: "Документация API",
     fullIntegrationGuide: "Полное руководство по интеграции ChainScout API и SDK в ваши проекты",
-    api: "API",
     sdk: "SDK",
     webhooks: "Webhooks",
     guides: "Руководства",

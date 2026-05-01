@@ -27,7 +27,7 @@ const ScanTemplates = () => {
   const [newTemplate, setNewTemplate] = useState({
     name: "",
     description: "",
-    scan_type: "github_repo",
+    scan_type: "contract_address",
     is_public: false,
   });
 
@@ -89,7 +89,7 @@ const ScanTemplates = () => {
       setNewTemplate({
         name: "",
         description: "",
-        scan_type: "github_repo",
+        scan_type: "contract_address",
         is_public: false,
       });
 
@@ -188,10 +188,9 @@ const ScanTemplates = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="github_repo">GitHub Репозиторий</SelectItem>
-                <SelectItem value="smart_contract">Смарт-контракт</SelectItem>
-                <SelectItem value="web_app">Web приложение</SelectItem>
-                <SelectItem value="api">API</SelectItem>
+                <SelectItem value="contract_address">Smart Contract</SelectItem>
+                <SelectItem value="solana_program">Solana Program</SelectItem>
+                <SelectItem value="web3_project">DApp / Web3 Project</SelectItem>
               </SelectContent>
             </Select>
           </div>
