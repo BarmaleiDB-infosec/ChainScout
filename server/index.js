@@ -232,7 +232,7 @@ async function processScan(jobId) {
     const { error: dbError } = await supabaseAdmin
       .from('scans')
       .insert({
-        id: jobId,
+        id: jobId.replace("scan_", ""),
         user_id: job.payload.userId,
         target_type: job.payload.targetType,
         target_url: job.payload.targetUrl,
