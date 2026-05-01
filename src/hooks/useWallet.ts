@@ -40,9 +40,9 @@ export function useWallet() {
           throw new Error('Ethereum wallet not found');
         }
 
-        const accounts = (await eth.request({ method: 'eth_requestAccounts' })) as string[] | unknown;
+        const accounts = (await eth.request({ method: 'eth_requestAccounts' })) as unknown;
         const address = Array.isArray(accounts) ? accounts[0] : null;
-        if (!address) {
+        if (!address || typeof address !== 'string') {
           throw new Error('No Ethereum account returned');
         }
 
@@ -50,16 +50,14 @@ export function useWallet() {
         return address;
       }
 
-      const sol = (window as any).solana as
-        | { connect: () => Promise<{ publicKey?: { toString: () => string } }> }
-        | undefined;
+      const sol = (window as any).solana || (window as any).phantom?.solana;
 
       if (!sol?.connect) {
         throw new Error('Solana wallet not found');
       }
 
       const res = await sol.connect();
-      const address = res?.publicKey?.toString?.() || null;
+      const address = res?.publicKey?.toString?.();
       if (!address) {
         throw new Error('No Solana public key returned');
       }

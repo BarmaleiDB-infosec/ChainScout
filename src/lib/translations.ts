@@ -80,6 +80,10 @@ export const translations = {
     connectSolana: "Solana",
     connecting: "Connecting...",
     walletError: "Failed to connect wallet",
+    walletNotFound: "Wallet not found",
+    installMetaMask: "Install MetaMask",
+    installPhantom: "Install Phantom",
+    walletConnected: "Wallet connected",
 
     // Common UI / Messages
     backToHome: "Back to home",
@@ -327,6 +331,10 @@ export const translations = {
     connectSolana: "Solana",
     connecting: "Подключение...",
     walletError: "Ошибка подключения кошелька",
+    walletNotFound: "Кошелёк не найден",
+    installMetaMask: "Установите MetaMask",
+    installPhantom: "Установите Phantom",
+    walletConnected: "Кошелёк подключён",
 
     // Common UI / Messages
     backToHome: "На главную",

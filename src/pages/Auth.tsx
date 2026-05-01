@@ -138,16 +138,31 @@ const Auth = () => {
   const handleWalletConnect = async (chain: 'ethereum' | 'solana') => {
     setWalletLoading(chain);
     try {
-      await connect(chain);
+      const address = await connect(chain);
+      if (address) {
+        localStorage.setItem('wallet_address', address);
+        localStorage.setItem('wallet_type', chain);
+      }
+
       toast({
-        title: t('successTitle'),
-        description: t('connecting'),
+        title: t('walletConnected'),
+        description: address ? `${t('walletConnected')}: ${address}` : t('walletConnected'),
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : t('walletError');
+      let description = message;
+
+      if (chain === 'ethereum' && message.includes('Ethereum wallet not found')) {
+        description = `${t('walletNotFound')}. ${t('installMetaMask')}: https://metamask.io/download`;
+      }
+
+      if (chain === 'solana' && message.includes('Solana wallet not found')) {
+        description = `${t('walletNotFound')}. ${t('installPhantom')}: https://phantom.app/download`;
+      }
+
       toast({
         title: t('walletError'),
-        description: message,
+        description,
         variant: "destructive",
       });
     } finally {
