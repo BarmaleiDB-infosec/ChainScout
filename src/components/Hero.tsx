@@ -28,7 +28,7 @@ const Hero = () => {
   }, []);
 
   const handleAnalyze = async () => {
-    if (!user) {
+    if (!localStorage.getItem("access_token")) {
       toast({
         title: "Ошибка",
         description: "Пожалуйста, войдите для запуска анализа",

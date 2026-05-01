@@ -78,7 +78,7 @@ const ScannerSelector = () => {
   }, []);
 
   const handleStartScan = async () => {
-    if (!user) {
+    if (!localStorage.getItem("access_token")) {
       toast({
         title: "Требуется вход",
         description: "Войдите, чтобы запускать и сохранять сканы в дашборде.",
