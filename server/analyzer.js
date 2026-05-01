@@ -316,8 +316,7 @@ async function prepareArtifact({ sourceKind, targetUrl, uploadedFilePath, origin
       const etherscanResult = await getContractSourceCode(targetUrl, chain);
       sourceResult = {
         filename: `${etherscanResult.name || 'contract'}.sol`,
-        source: etherscanResult.sourceCode || '',
-      };
+	source: typeof etherscanResult.sourceCode === 'string' ? etherscanResult.sourceCode : String(etherscanResult.sourceCode?.['Contract.sol'] || ''),      };
     } catch (error) {
       console.warn(`Failed to fetch from Etherscan for ${targetUrl}:`, error.message);
       // Fallback to placeholder
