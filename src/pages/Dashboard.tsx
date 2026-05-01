@@ -76,10 +76,10 @@ const Dashboard = () => {
   }, [location.state]);
 
   useEffect(() => {
-    if (user) {
+    if (localStorage.getItem("access_token")) {
       loadRecentScans();
     }
-  }, [user, loadRecentScans]);
+  }, [loadRecentScans]);
 
   if (loadingScans) {
     return (
