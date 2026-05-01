@@ -590,3 +590,7 @@ app.post("/api/solana/scan", requireAuth, scanLimiter, async (req, res) => {
   }
 });
 
+
+app.listen(port, () => {
+  console.log(`ChainScout server listening on ${port}`);
+});
