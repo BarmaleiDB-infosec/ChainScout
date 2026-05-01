@@ -51,7 +51,7 @@ export const translations = {
     totalVulnerabilities: "Vulnerabilities Found",
     projectsScanned: "Projects Analyzed",
   welcomeBack: "Welcome back",
-  monitorSecurity: "Monitor your security scans and manage your subscription",
+  monitorSecurity: "Monitor your security scans and stay on top of your security posture",
   newScan: "New Scan",
   integrations: "Integrations",
   remaining: "remaining",
@@ -95,19 +95,6 @@ export const translations = {
     unknownError: "Unknown error",
     passwordHint: "Minimum 8 characters, uppercase and lowercase letters, and a number",
     
-    // Subscription
-    subscriptionPlans: "Subscription Plans",
-    choosePlan: "Choose the perfect plan for your security needs",
-    popular: "Popular",
-    selectPlan: "Select Plan",
-    freePlan: "Free Plan",
-    proPlan: "Pro Plan",
-    basicScan: "Basic scanning only",
-    standardReport: "Standard report",
-    allScanTypes: "All scan types",
-    aiReport: "Detailed AI report",
-    recommendations: "AI recommendations",
-    
     // Footer
     documentation: "Documentation",
     api: "API",
@@ -137,10 +124,6 @@ export const translations = {
     settings: "Settings",
 
     // Dashboard Page
-    currentPlan: "Current Plan",
-    scansUsed: "Scans Used",
-    upgradeToP: "Upgrade to Pro",
-    unlimited: "Unlimited",
     securityAnalysesCompleted: "Security analyses completed",
     backToScanList: "← Back to scan list",
     scanHistory: "Scan History",
@@ -159,9 +142,7 @@ export const translations = {
     processing: "Processing",
     failed: "Failed",
     pending: "Pending",
-    planFeatures: "Plan Features",
     manage: "Manage",
-    whatIncluded: "What's included in your plan",
 
     // ScanResults Component
     riskAssessment: "Risk Assessment",
@@ -346,19 +327,6 @@ export const translations = {
     unknownError: "Неизвестная ошибка",
     passwordHint: "Минимум 8 символов, заглавная и строчная буквы, цифра",
     
-    // Subscription
-    subscriptionPlans: "Планы подписки",
-    choosePlan: "Выберите идеальный план для ваших потребностей в безопасности",
-    popular: "Популярный",
-    selectPlan: "Выбрать план",
-    freePlan: "Бесплатный план",
-    proPlan: "Pro версия",
-    basicScan: "Только базовое сканирование",
-    standardReport: "Стандартный отчёт",
-    allScanTypes: "Все виды сканирования",
-    aiReport: "Подробный ИИ отчёт",
-    recommendations: "ИИ рекомендации",
-    
     // Footer
     documentation: "Документация",
     api: "API",
@@ -388,10 +356,6 @@ export const translations = {
     settings: "Настройки",
 
     // Dashboard Page
-    currentPlan: "Текущий план",
-    scansUsed: "Использовано сканирований",
-    upgradeToP: "Обновить до Pro",
-    unlimited: "Неограниченный",
     securityAnalysesCompleted: "Анализ безопасности завершён",
     backToScanList: "← Назад к списку",
     scanHistory: "История сканирований",
@@ -410,9 +374,7 @@ export const translations = {
     processing: "Обработка",
     failed: "Ошибка",
     pending: "Ожидание",
-    planFeatures: "Возможности плана",
     manage: "Управление",
-    whatIncluded: "Что включено в ваш текущий план",
 
     // ScanResults Component
     riskAssessment: "Оценка рисков",

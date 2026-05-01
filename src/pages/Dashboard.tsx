@@ -4,24 +4,18 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Crown, Shield, Zap, FileText, Settings, Plus, ExternalLink, Plug } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import SubscriptionModal from "@/components/SubscriptionModal";
+import { Shield, Plus, ExternalLink, Plug } from "lucide-react";
 import ScanResults from "@/components/ScanResults";
 import { listRecentApiScans, type ScanJob } from "@/lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { subscription, loading, getRemainingScans } = useSubscription();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   type DashboardScan = {
     id: string;
     target_url: string;
@@ -30,7 +24,7 @@ const Dashboard = () => {
     results?: Record<string, unknown> | null;
     ai_analysis?: string | null;
     created_at: string;
-    source: "supabase" | "api";
+    source: "api";
   };
 
   const [recentScans, setRecentScans] = useState<DashboardScan[]>([]);
@@ -39,15 +33,7 @@ const Dashboard = () => {
 
   const loadRecentScans = useCallback(async () => {
     try {
-      const [apiScans, supabaseResult] = await Promise.all([
-        listRecentApiScans().catch(() => [] as ScanJob[]),
-        supabase
-        .from('scan_history')
-        .select('*')
-        .order('created_at', { ascending: false }),
-      ]);
-
-      if (supabaseResult.error) throw supabaseResult.error;
+      const apiScans = await listRecentApiScans().catch(() => [] as ScanJob[]);
 
       const apiRows: DashboardScan[] = apiScans.map((scan) => ({
         id: scan.id,
@@ -71,20 +57,15 @@ const Dashboard = () => {
         source: "api",
       }));
 
-      const supabaseRows: DashboardScan[] = ((supabaseResult.data || []) as unknown as Omit<DashboardScan, "source">[]).map((row) => ({
-        ...row,
-        source: "supabase",
-      }));
-
-      const merged = [...apiRows, ...supabaseRows].sort(
+      const sorted = apiRows.sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 
-      setRecentScans(merged);
+      setRecentScans(sorted);
 
       const routeScan = (location.state as { apiScan?: ScanJob } | null)?.apiScan;
       if (routeScan?.id) {
-        const matched = merged.find((scan) => scan.id === routeScan.id);
+        const matched = sorted.find((scan) => scan.id === routeScan.id);
         if (matched) {
           setSelectedScan(matched);
         }
@@ -102,11 +83,7 @@ const Dashboard = () => {
     }
   }, [user, loadRecentScans]);
 
-  const remainingScans = getRemainingScans();
-  const usagePercentage = subscription ? 
-    (subscription.scans_used / (subscription.plan.scan_limit || 100)) * 100 : 0;
-
-  if (loading) {
+  if (loadingScans) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
@@ -147,70 +124,6 @@ const Dashboard = () => {
               {t('integrations')}
             </Button>
           </div>
-
-          {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Subscription Status */}
-          <Card className="border-border/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('currentPlan')}</CardTitle>
-              {subscription?.plan.name === 'Pro' ? (
-                <Crown className="h-4 w-4 text-primary" />
-              ) : (
-                <Shield className="h-4 w-4 text-muted-foreground" />
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{subscription?.plan.name || 'Free'}</div>
-              <p className="text-xs text-muted-foreground">
-                ${subscription?.plan.price_monthly || 0}/month
-              </p>
-              {subscription?.plan.name === 'Free' && (
-                <Button 
-                  onClick={() => setShowSubscriptionModal(true)}
-                  size="sm" 
-                  className="mt-2"
-                >
-                  {t('upgradeToP')}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Scans Used */}
-          <Card className="border-border/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('scansUsed')}</CardTitle>
-              <Zap className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {subscription?.scans_used || 0}
-                <span className="text-sm font-normal text-muted-foreground">
-                  /{subscription?.plan.scan_limit || '∞'}
-                </span>
-              </div>
-              <Progress value={usagePercentage} className="mt-2" />
-              <p className="text-xs text-muted-foreground mt-1">
-                {remainingScans === Infinity ? t('unlimited') : `${remainingScans} ${t('remaining')}`}
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Total Reports */}
-          <Card className="border-border/50">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('totalScans')}</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{recentScans.length}</div>
-              <p className="text-xs text-muted-foreground">
-                {t('securityAnalysesCompleted')}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Recent Activity */}
         <div className="space-y-6">
@@ -278,7 +191,7 @@ const Dashboard = () => {
                               </div>
                               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                                 <Badge variant="outline">{scan.scan_type}</Badge>
-                                <Badge variant="secondary">{scan.source === "api" ? "API Job" : "Supabase"}</Badge>
+                                <Badge variant="secondary">API Job</Badge>
                                 <span>{new Date(scan.created_at).toLocaleDateString('ru-RU')}</span>
                               </div>
                               {scan.results?.summary && (
@@ -316,45 +229,10 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           )}
-
-          {/* Subscription Details */}
-          {!selectedScan && (
-            <Card className="border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  {t('planFeatures')}
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => setShowSubscriptionModal(true)}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    {t('manage')}
-                  </Button>
-                </CardTitle>
-                <CardDescription>
-                  {t('whatIncluded')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {((subscription?.plan.features as string[]) || []).map((feature: string, index: number) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Badge variant="secondary" className="text-xs">✓</Badge>
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
         </div>
       </main>
 
       <Footer />
-      
-      <SubscriptionModal 
-        open={showSubscriptionModal}
-        onOpenChange={setShowSubscriptionModal}
-      />
     </div>
   );
 };

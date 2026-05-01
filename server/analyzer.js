@@ -849,65 +849,38 @@ function buildLimitations(sourceKind, artifact, toolsUsed) {
   return limitations;
 }
 
+const { generateAiAnalysis } = require('./ai/report-generator');
+
 async function buildAiAnalysis({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact }) {
   const datasetExamples = loadRecentDatasetEntries(3);
   const fallback = buildFallbackAiAnalysis({ targetType, targetUrl, sourceKind, findings, vulnerabilities, toolsUsed, artifact });
 
-  if (!process.env.OPENAI_API_KEY) {
-    return fallback;
-  }
-
   try {
-    const prompt = [
-      'You are ChainScout, a senior web3 security analyst.',
-      'Produce a detailed but concise JSON object with keys: executiveSummary, criticalRisks, remediationRoadmap, trainingSignals.',
-      `Target type: ${targetType}`,
-      `Target url: ${targetUrl || 'uploaded artifact'}`,
-      `Source kind: ${sourceKind}`,
-      `Scan level: ${level}`,
-      `Severity breakdown: ${JSON.stringify(vulnerabilities)}`,
-      `Tools used: ${JSON.stringify(toolsUsed)}`,
-      `Coverage: ${describeCoverage(sourceKind, artifact)}`,
-      `Recent dataset examples: ${JSON.stringify(datasetExamples)}`,
-      `Findings: ${JSON.stringify(findings.slice(0, 20))}`,
-    ].join('\n');
+    const aiAnalysis = await generateAiAnalysis({
+      targetType,
+      targetUrl,
+      sourceKind,
+      level,
+      findings,
+      vulnerabilities,
+      toolsUsed,
+      artifact,
+      datasetExamples,
+    });
 
-      const resp = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
-        {
-        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        response_format: { type: 'json_object' },
-          messages: [
-          { role: 'system', content: 'You write actionable web3 audit reports with severity, exploitability and remediation guidance.' },
-            { role: 'user', content: prompt },
-          ],
-        max_tokens: 1200,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-        timeout: 25000,
-        }
-      );
-
-      const content = resp.data?.choices?.[0]?.message?.content;
-    const parsed = safeJsonParse(content);
-    if (!parsed?.executiveSummary) {
-      return fallback;
+    if (aiAnalysis?.executiveSummary) {
+      return {
+        executiveSummary: aiAnalysis.executiveSummary,
+        criticalRisks: aiAnalysis.criticalRisks || fallback.criticalRisks,
+        remediationRoadmap: aiAnalysis.remediationRoadmap || fallback.remediationRoadmap,
+        trainingSignals: aiAnalysis.trainingSignals || fallback.trainingSignals,
+      };
     }
-
-    return {
-      executiveSummary: parsed.executiveSummary,
-      criticalRisks: parsed.criticalRisks || fallback.criticalRisks,
-      remediationRoadmap: parsed.remediationRoadmap || fallback.remediationRoadmap,
-      trainingSignals: parsed.trainingSignals || fallback.trainingSignals,
-    };
   } catch (error) {
-    console.warn('OpenAI analysis failed, using fallback summary:', error?.message || error);
-    return fallback;
+    console.warn('AI analysis failed, using fallback summary:', error?.message || error);
   }
+
+  return fallback;
 }
 
 function buildFallbackAiAnalysis({ targetType, targetUrl, findings, vulnerabilities, toolsUsed }) {
