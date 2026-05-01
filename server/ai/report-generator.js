@@ -20,7 +20,7 @@ function parseJsonObject(value) {
 
 function buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples }) {
   return [
-    'You are a senior smart contract security auditor with 10+ years of experience.',
+    'Ты — senior аудитор смарт-контрактов. Пиши ТОЛЬКО на русском языке. Давай КОНКРЕТНЫЕ примеры кода Solidity для каждого исправления.',
     'Analyze the findings below and produce a JSON object with these keys:',
     '- executiveSummary: 2-3 sentence summary of risk level and key issues',
     '- criticalRisks: array of CRITICAL/HIGH findings with exploit scenario for each',
@@ -47,7 +47,7 @@ async function getOpenRouterAiAnalysis({ prompt, maxTokens }) {
     messages: [
       {
         role: 'system',
-        content: 'You are a senior Web3 security auditor. You provide SPECIFIC, ACTIONABLE recommendations with code examples. You NEVER give generic advice. Every finding gets a concrete fix with Solidity/Rust code.',
+        content: 'Ты — senior Web3 аудитор. Пиши на русском. Даёшь КОНКРЕТНЫЕ исправления с ПРИМЕРАМИ КОДА Solidity/Rust. Никаких общих советов — только точный код.',
       },
       { role: 'user', content: prompt },
     ],
