@@ -249,12 +249,20 @@ async function processScan(jobId) {
   }
 }
 
-app.get('/api/scans/recent', requireAuth, scanLimiter, (req, res) => {
-  const userId = req.user?.id;
-  res.json({
-    ok: true,
-    scans: listRecentScans(20, userId),
-  });
+app.get('/api/scans/recent', requireAuth, scanLimiter, async (req, res) => {
+  try {
+    const { data: scans, error } = await supabaseAdmin
+      .from('scans')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(20);
+    
+    if (error) throw error;
+    res.json({ ok: true, scans });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
 });
 
 app.get('/api/scans/:id', requireAuth, scanLimiter, (req, res) => {
