@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -8,14 +7,19 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [isAuth, setIsAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
       navigate('/auth');
+    } else {
+      setIsAuth(true);
     }
-  }, [user, loading, navigate]);
+    setLoading(false);
+  }, [navigate]);
 
   if (loading) {
     return (
@@ -28,7 +32,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  if (!user) {
+  if (!isAuth) {
     return null;
   }
 

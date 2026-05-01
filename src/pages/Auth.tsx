@@ -103,7 +103,7 @@ const Auth = () => {
       const data = await loginUser(email, password);
       
       // Сохраняем токен
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('access_token', data.token);
       if (data.refresh_token) {
         localStorage.setItem('refresh_token', data.refresh_token);
       }
@@ -113,7 +113,7 @@ const Auth = () => {
         description: t('signInSuccess'),
       });
 
-      navigate("/dashboard");
+      localStorage.setItem("user_email", data.user.email); localStorage.setItem("user_id", data.user.id); window.location.href = "/dashboard";
     } catch (error: Error | unknown) {
       const message = error instanceof Error ? error.message : t('unknownError');
       toast({

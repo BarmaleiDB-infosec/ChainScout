@@ -1,7 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, User } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import LanguageSwitch from "./LanguageSwitch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,8 +9,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 const Header = () => {
   const { t } = useTranslation();
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const email = localStorage.getItem('user_email');
+    if (token && email) {
+      setUserEmail(email);
+    }
+  }, []);
+  
+  const handleSignOut = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_id');
+    setUserEmail(null);
+    navigate('/');
+  };
   
   return (
     <header className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 transition-all duration-300 hover:shadow-lg">
@@ -30,16 +47,16 @@ const Header = () => {
           {/* Auth Buttons */}
           <div className="flex items-center space-x-3">
             <LanguageSwitch />
-            {user ? (
+            {userEmail ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2">
                     <Avatar className="w-8 h-8">
                       <AvatarFallback>
-                        {user.email?.charAt(0).toUpperCase()}
+                        {userEmail.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="hidden md:inline">{user.email?.split('@')[0]}</span>
+                    <span className="hidden md:inline">{userEmail.split('@')[0]}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -47,7 +64,7 @@ const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     {t('dashboard')}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={signOut}>
+                  <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     {t('signOut')}
                   </DropdownMenuItem>

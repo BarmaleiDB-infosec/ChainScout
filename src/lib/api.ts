@@ -211,3 +211,34 @@ export const healthCheck = async (): Promise<boolean> => {
     return false;
   }
 };
+
+// ============================================
+// AUTH API — через наш бэкенд, а не Supabase напрямую
+// ============================================
+export async function registerUser(email: string, password: string) {
+  const API_URL = import.meta.env.VITE_API_URL || "";
+  const response = await fetch(`${API_URL}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || "Registration failed");
+  }
+  return response.json();
+}
+
+export async function loginUser(email: string, password: string) {
+  const API_URL = import.meta.env.VITE_API_URL || "";
+  const response = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || "Login failed");
+  }
+  return response.json();
+}

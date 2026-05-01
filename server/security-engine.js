@@ -1,89 +1,180 @@
-﻿/**
- * ChainScout Security Engine
- * Detects 7 critical Solidity vulnerability categories
- * 
- * Categories:
- * 1. Reentrancy attacks (call stack depth/state manipulation)
- * 2. Integer overflow/underflow
- * 3. tx.origin misuse (authorization bypass)
- * 4. Unchecked calls (ignored return values)
- * 5. Delegatecall misuse (code injection)
- * 6. Access control issues
- * 7. Timestamp dependence (block time manipulation)
- */
-
-const fs = require('fs');
-const path = require('path');
-
-// Regex patterns for vulnerability detection
-const PATTERNS = {
-  // 1. Reentrancy
-  reentrancy: [
-    /\.call\s*(\{[^}]*\})?\s*\(\s*\)/,  // .call()
-    /\.call\.value\s*\(/,                 // .call.value()
-    /\.transfer\s*\(.*\)\s*;[^}]*\1/,     // transfer but then use state
-    /\.send\s*\(/,                        // .send()
-    /require\s*\(\s*[a-zA-Z_][a-zA-Z0-9_]*\.call/,  // require().call
-  ],
-  
-  // 2. Integer overflow/underflow
-  integerArithmetic: [
-    /[a-zA-Z_][a-zA-Z0-9_]*\s*\+=\s*[a-zA-Z_]/,      // += non-constant
-    /[a-zA-Z_][a-zA-Z0-9_]*\s*-=\s*[a-zA-Z_]/,      // -= non-constant
-    /[a-zA-Z_][a-zA-Z0-9_]*\s*\*=\s*[a-zA-Z_]/,     // *= non-constant
-    /[a-zA-Z_][a-zA-Z0-9_]*\s*\/=\s*[a-zA-Z_]/,     // /= non-constant
-    /require\s*\([^)]*<\s*[a-zA-Z_]/,               // underflow check
-    /require\s*\([^)]*>\s*[a-zA-Z_]/,               // overflow check
-  ],
-  
-  // 3. tx.origin misuse
-  txOrigin: [
-    /tx\.origin/,                                     // Direct tx.origin use
-    /require\s*\(\s*tx\.origin\s*==\s*msg\.sender/,  // tx.origin == msg.sender
-    /if\s*\(\s*tx\.origin\s*!=\s*msg\.sender/,       // Conditional on tx.origin
-  ],
-  
-  // 4. Unchecked calls
-  uncheckedCalls: [
-    /\.call\s*(\{[^}]*\})?\s*\(\s*\);(?!\s*require|\s*assert)/,  // .call() not checked
-    /\.send\s*\([^)]*\);(?!\s*require|\s*assert)/,               // .send() not checked
-    /\.transfer\s*\([^)]*\);(?!\s*require|\s*assert)/,           // transfer could fail
-    /address\s*\([a-zA-Z_][a-zA-Z0-9_]*\)\.call\(/,             // Unchecked delegatecall
-  ],
-  
-  // 5. Delegatecall misuse
-  delegatecall: [
-    /delegatecall\s*\(/,                             // delegatecall usage
-    /delegatecall\s*\([^)]*\)(?!\s*require|\s*assert)/,  // unchecked delegatecall
-    /assembly\s*{[^}]*delegatecall/,                 // delegatecall in assembly
-  ],
-  
-  // 6. Access control issues
-  accessControl: [
-    /public\s+function\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)]*\)\s*(?!internal|private|external)/,  // public functions
-    /function\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)]*\)\s*(?:public|external)\s*{[^}]*selfdestruct/,  // public selfdestruct
-    /function\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)]*\)\s*(?:public|external)\s*{[^}]*\.call\s*\{value:/,  // public payable
-  ],
-  
-  // 7. Timestamp dependence
-  timestampDependence: [
-    /require\s*\(\s*block\.timestamp\s*[<>]=?\s*\d+/,  // timestamp comparison
-    /if\s*\(\s*block\.timestamp/,                        // conditional on timestamp
-    /now\s*[<>=!]+/,                                     // 'now' comparisons (deprecated but used)
-  ],
-};
-
 /**
- * Analyze Solidity source code for vulnerabilities
- * @param {string} sourceCode - Raw Solidity code
- * @param {string} filename - Original filename
- * @returns {Array} Array of findings
+ * ChainScout Security Engine
+ * Static analysis for Solidity smart contracts
  */
-function analyzeSolidityCode(sourceCode, filename) {
+
+function detectReentrancy(sourceCode, lines, filename) {
   const findings = [];
-  const lines = sourceCode.split('\n');
+  const patterns = [
+    /\.call\.value\s*\(/g,
+    /\.send\s*\(/g,
+    /\.transfer\s*\(/g,
+  ];
   
-  // Check for each vulnerability category
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+      findings.push({
+        category: 'Reentrancy',
+        severity: 'high',
+        description: `External call detected in ${filename}:${lineIndex}. Ensure CEI pattern.`,
+        location: `${filename}:${lineIndex}`,
+        recommendation: 'Use Checks-Effects-Interactions or ReentrancyGuard.',
+      });
+    }
+  }
+  return findings;
+}
+
+function detectIntegerArithmetic(sourceCode, lines, filename) {
+  const findings = [];
+  const patterns = [/(\+\+|--|\+=|-=|\*=|\/=)/g, /(\+\s*\d+|\-\s*\d+|\*\s*\d+)/g];
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      if (!sourceCode.includes('SafeMath') && !sourceCode.includes('unchecked')) {
+        const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+        findings.push({
+          category: 'Integer Overflow/Underflow',
+          severity: 'medium',
+          description: `Arithmetic without SafeMath in ${filename}:${lineIndex}`,
+          location: `${filename}:${lineIndex}`,
+          recommendation: 'Use Solidity 0.8+ built-in overflow checks.',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function detectTxOrigin(sourceCode, lines, filename) {
+  const findings = [];
+  if (sourceCode.includes('tx.origin')) {
+    const lineNum = sourceCode.substring(0, sourceCode.indexOf('tx.origin')).split('\n').length;
+    findings.push({
+      category: 'tx.origin Misuse',
+      severity: 'high',
+      description: `tx.origin used in ${filename}:${lineNum}. Vulnerable to phishing.`,
+      location: `${filename}:${lineNum}`,
+      recommendation: 'Use msg.sender instead of tx.origin.',
+    });
+  }
+  return findings;
+}
+
+function detectUncheckedCalls(sourceCode, lines, filename) {
+  const findings = [];
+  const patterns = [/\.call\s*\{/g, /\.delegatecall\s*\{/g, /\.staticcall\s*\{/g];
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      const context = sourceCode.substring(Math.max(0, match.index - 50), match.index + 100);
+      if (!context.includes('require(') && !context.includes('if (')) {
+        const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+        findings.push({
+          category: 'Unchecked Call',
+          severity: 'high',
+          description: `Low-level call without check in ${filename}:${lineIndex}`,
+          location: `${filename}:${lineIndex}`,
+          recommendation: 'Check return values with require(success).',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function detectDelegatecall(sourceCode, lines, filename) {
+  const findings = [];
+  if (sourceCode.includes('delegatecall')) {
+    const lineNum = sourceCode.substring(0, sourceCode.indexOf('delegatecall')).split('\n').length;
+    findings.push({
+      category: 'Delegatecall Misuse',
+      severity: 'critical',
+      description: `delegatecall in ${filename}:${lineNum}. Target must be trusted.`,
+      location: `${filename}:${lineNum}`,
+      recommendation: 'Use libraries or ensure delegatecall target is immutable.',
+    });
+  }
+  return findings;
+}
+
+function detectAccessControl(sourceCode, lines, filename) {
+  const findings = [];
+  const sensitiveFunctions = [
+    /function\s+withdraw\s*\(/g,
+    /function\s+mint\s*\(/g,
+    /function\s+burn\s*\(/g,
+    /function\s+setOwner\s*\(/g,
+    /function\s+transferOwnership\s*\(/g,
+  ];
+  
+  for (const pattern of sensitiveFunctions) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      const funcStart = match.index;
+      const funcEnd = sourceCode.indexOf('{', funcStart);
+      const funcBody = sourceCode.substring(funcStart, funcEnd + 1);
+      
+      if (!funcBody.includes('onlyOwner') && !funcBody.includes('require(')) {
+        const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+        findings.push({
+          category: 'Access Control',
+          severity: 'critical',
+          description: `Sensitive function without modifier in ${filename}:${lineIndex}`,
+          location: `${filename}:${lineIndex}`,
+          recommendation: 'Add onlyOwner, RBAC, or require(msg.sender == owner).',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function detectTimestampDependence(sourceCode, lines, filename) {
+  const findings = [];
+  if (sourceCode.includes('block.timestamp') || sourceCode.includes('now')) {
+    const patterns = [/block\.timestamp/g, /\bnow\b/g];
+    for (const pattern of patterns) {
+      let match;
+      while ((match = pattern.exec(sourceCode)) !== null) {
+        const context = sourceCode.substring(Math.max(0, match.index - 100), match.index + 100);
+        if (context.includes('require(') || context.includes('if (') || context.includes('assert(')) {
+          const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+          findings.push({
+            category: 'Timestamp Dependence',
+            severity: 'low',
+            description: `block.timestamp in critical logic in ${filename}:${lineIndex}`,
+            location: `${filename}:${lineIndex}`,
+            recommendation: 'Avoid block.timestamp for exact timing.',
+          });
+        }
+      }
+    }
+  }
+  return findings;
+}
+
+function deduplicate(findings) {
+  const seen = new Set();
+  const deduplicated = [];
+  for (const finding of findings) {
+    const key = `${finding.category}:${finding.location}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(finding);
+    }
+  }
+  return deduplicated;
+}
+
+function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
+  const lines = sourceCode.split('\n');
+  let findings = [];
+  
   findings.push(...detectReentrancy(sourceCode, lines, filename));
   findings.push(...detectIntegerArithmetic(sourceCode, lines, filename));
   findings.push(...detectTxOrigin(sourceCode, lines, filename));
@@ -92,409 +183,57 @@ function analyzeSolidityCode(sourceCode, filename) {
   findings.push(...detectAccessControl(sourceCode, lines, filename));
   findings.push(...detectTimestampDependence(sourceCode, lines, filename));
   
-  // Deduplicate and score findings
-  return deduplicateFindings(findings);
+  findings = deduplicate(findings);
+  
+  const severityScore = { critical: 25, high: 15, medium: 10, low: 5, info: 1 };
+  const riskScore = Math.min(100, findings.reduce((sum, f) => sum + (severityScore[f.severity] || 1), 0));
+  
+  return { filename, findings, totalFindings: findings.length, riskScore };
 }
-
-/**
- * 1. Detect Reentrancy vulnerabilities
- */
-function detectReentrancy(sourceCode, lines, filename) {
-  const findings = [];
-  let lineNum = 0;
-  let inFunction = false;
-  let callStack = [];
-  
-  lines.forEach((line, index) => {
-    lineNum = index + 1;
-    
-    // Track function boundaries
-    if (/function\s+\w+\s*\(/.test(line)) inFunction = true;
-    if (inFunction && /^\s*}/.test(line)) inFunction = false;
-    
-    // Check for dangerous patterns
-    PATTERNS.reentrancy.forEach(pattern => {
-      if (pattern.test(line)) {
-        // Check if state is modified after call
-        const remainingCode = lines.slice(index).join('\n');
-        const stateModification = /\w+\s*[+\-*/=]+|require|assert|revert/;
-        
-        if (stateModification.test(remainingCode.substring(0, 500))) {
-          findings.push({
-            id: `reentrancy-${lineNum}`,
-            title: 'Potential Reentrancy Vulnerability',
-            category: 'reentrancy',
-            severity: 'high',
-            confidence: 'medium',
-            confidenceScore: 0.75,
-            description: 'Function performs external call (.call, .send, .transfer) and may modify state. Vulnerable to reentrancy attacks if state is not properly protected.',
-            evidence: `Line ${lineNum}: ${line.trim()}`,
-            location: `${filename}:${lineNum}`,
-            tool: 'chainscout-engine',
-            recommendation: 'Use Checks-Effects-Interactions pattern. Check state before external calls, update effects after.',
-            references: ['https://solidity-by-example.org/hacks/re-entrancy/'],
-          });
-        }
-      }
-    });
-  });
-  
-  return findings;
-}
-
-/**
- * 2. Detect Integer Overflow/Underflow
- */
-function detectIntegerArithmetic(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    // Check for arithmetic without SafeMath or Solidity 0.8+
-    const arithmeticPatterns = [
-      { pattern: /uint\d*\s+\w+\s*=[^;]*[+\-*/]/,  op: 'arithmetic' },
-      { pattern: /\w+\s+\+=\s*\w+/, op: '+=' },
-      { pattern: /\w+\s+-=\s*\w+/, op: '-=' },
-      { pattern: /\w+\s+\*=\s*\w+/, op: '*=' },
-      { pattern: /\w+\s+\/=\s*\w+/, op: '/=' },
-    ];
-    
-    arithmeticPatterns.forEach(({ pattern, op }) => {
-      if (pattern.test(line)) {
-        // Check if using SafeMath or pragma >= 0.8
-        if (!/SafeMath|solidity\s+>=\s*0\.8/.test(sourceCode)) {
-          findings.push({
-            id: `integer-arithmetic-${lineNum}`,
-            title: `Potential Integer ${op === '+=' ? 'Overflow' : 'Underflow'} (${op})`,
-            category: 'integer-arithmetic',
-            severity: 'high',
-            confidence: 'medium',
-            confidenceScore: 0.72,
-            description: `Arithmetic operation ${op} detected without SafeMath library or Solidity >= 0.8.0. Vulnerable to over/underflow attacks.`,
-            evidence: `Line ${lineNum}: ${line.trim()}`,
-            location: `${filename}:${lineNum}`,
-            tool: 'chainscout-engine',
-            recommendation: 'Use Solidity >= 0.8.0 (automatic overflow protection) or SafeMath library for older versions.',
-            references: ['https://docs.soliditylang.org/en/latest/080-breaking-changes.html'],
-          });
-        }
-      }
-    });
-  });
-  
-  return findings;
-}
-
-/**
- * 3. Detect tx.origin misuse
- */
-function detectTxOrigin(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    if (/tx\.origin/.test(line)) {
-      findings.push({
-        id: `tx-origin-${lineNum}`,
-        title: 'Use of tx.origin for Authorization',
-        category: 'tx-origin-misuse',
-        severity: 'high',
-        confidence: 'high',
-        confidenceScore: 0.95,
-        description: 'tx.origin should never be used for authentication or authorization. It refers to the original transaction sender, not the immediate caller. Vulnerable to phishing attacks.',
-        evidence: `Line ${lineNum}: ${line.trim()}`,
-        location: `${filename}:${lineNum}`,
-        tool: 'chainscout-engine',
-        recommendation: 'Use msg.sender for authorization instead of tx.origin. tx.origin is only safe for logging.',
-        references: ['https://solidity-by-example.org/hacks/phishing-with-tx-origin/'],
-      });
-    }
-  });
-  
-  return findings;
-}
-
-/**
- * 4. Detect Unchecked Calls
- */
-function detectUncheckedCalls(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    // Check for call/send/transfer without require/assert
-    const uncheckedPatterns = [
-      { pattern: /\.call\s*(\{[^}]*\})?\s*\(\s*\)\s*;/, method: '.call()' },
-      { pattern: /\.send\s*\([^)]*\)\s*;/, method: '.send()' },
-      { pattern: /\.transfer\s*\([^)]*\)\s*;/, method: '.transfer()' },
-    ];
-    
-    uncheckedPatterns.forEach(({ pattern, method }) => {
-      if (pattern.test(line)) {
-        // Check if wrapped in require/assert
-        const isChecked = /require|assert/.test(line);
-        if (!isChecked) {
-          findings.push({
-            id: `unchecked-call-${lineNum}`,
-            title: `Unchecked ${method} Return Value`,
-            category: 'unchecked-calls',
-            severity: 'high',
-            confidence: 'high',
-            confidenceScore: 0.9,
-            description: `${method} return value is not checked. External call failure will be silently ignored, potentially leading to unexpected behavior.`,
-            evidence: `Line ${lineNum}: ${line.trim()}`,
-            location: `${filename}:${lineNum}`,
-            tool: 'chainscout-engine',
-            recommendation: `Always wrap ${method} in require() or assert() to handle failure cases.`,
-            references: ['https://solidity-by-example.org/call/'],
-          });
-        }
-      }
-    });
-  });
-  
-  return findings;
-}
-
-/**
- * 5. Detect Delegatecall Misuse
- */
-function detectDelegatecall(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    if (/delegatecall/.test(line)) {
-      const isChecked = /require|assert/.test(line);
-      
-      findings.push({
-        id: `delegatecall-${lineNum}`,
-        title: 'delegatecall() Usage Detected',
-        category: 'delegatecall-misuse',
-        severity: isChecked ? 'medium' : 'high',
-        confidence: 'high',
-        confidenceScore: 0.88,
-        description: 'delegatecall() is a powerful but dangerous feature. It executes code in the caller\'s context. Vulnerable to code injection if untrusted addresses are delegated to.',
-        evidence: `Line ${lineNum}: ${line.trim()}`,
-        location: `${filename}:${lineNum}`,
-        tool: 'chainscout-engine',
-        recommendation: 'Only delegatecall to trusted, audited contracts. Verify that delegated contracts cannot modify storage unexpectedly.',
-        references: ['https://solidity-by-example.org/delegatecall/'],
-      });
-    }
-  });
-  
-  return findings;
-}
-
-/**
- * 6. Detect Access Control Issues
- */
-function detectAccessControl(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    // Check for public functions without access modifiers
-    if (/function\s+\w+\s*\([^)]*\)\s*public\s*{/.test(line) && !/onlyOwner|onlyAdmin|require/.test(line)) {
-      findings.push({
-        id: `access-control-${lineNum}`,
-        title: 'Missing Access Control on Public Function',
-        category: 'access-control',
-        severity: 'medium',
-        confidence: 'medium',
-        confidenceScore: 0.65,
-        description: 'Public function lacks access control modifiers. Any address can call this function, potentially leading to unauthorized actions.',
-        evidence: `Line ${lineNum}: ${line.trim()}`,
-        location: `${filename}:${lineNum}`,
-        tool: 'chainscout-engine',
-        recommendation: 'Add onlyOwner, onlyAdmin, or similar access control modifiers to sensitive functions.',
-        references: ['https://docs.openzeppelin.com/contracts/4.x/access-control'],
-      });
-    }
-    
-    // Check for selfdestruct in public functions
-    if (/selfdestruct/.test(line) && /function/.test(sourceCode.split('\n')[index - 5] || '')) {
-      findings.push({
-        id: `access-control-selfdestruct-${lineNum}`,
-        title: 'selfdestruct() in Accessible Function',
-        category: 'access-control',
-        severity: 'critical',
-        confidence: 'high',
-        confidenceScore: 0.9,
-        description: 'selfdestruct() can destroy the entire contract without permission checking. This could be catastrophic.',
-        evidence: `Line ${lineNum}: ${line.trim()}`,
-        location: `${filename}:${lineNum}`,
-        tool: 'chainscout-engine',
-        recommendation: 'Restrict selfdestruct with onlyOwner modifier. Consider if contract destruction is really necessary.',
-        references: ['https://solidity-by-example.org/selfdestruct/'],
-      });
-    }
-  });
-  
-  return findings;
-}
-
-/**
- * 7. Detect Timestamp Dependence
- */
-function detectTimestampDependence(sourceCode, lines, filename) {
-  const findings = [];
-  
-  lines.forEach((line, index) => {
-    const lineNum = index + 1;
-    
-    // Check for block.timestamp or 'now' usage
-    if (/block\.timestamp|now\s*[<>=!]/.test(line)) {
-      // Check if it's a simple comparison or used for critical logic
-      const isCritical = /require\s*\([^)]*block\.timestamp|if\s*\([^)]*block\.timestamp/.test(line);
-      
-      findings.push({
-        id: `timestamp-dependence-${lineNum}`,
-        title: 'Timestamp Dependence Detected',
-        category: 'timestamp-dependence',
-        severity: isCritical ? 'medium' : 'low',
-        confidence: 'medium',
-        confidenceScore: 0.7,
-        description: 'Contract logic depends on block.timestamp. Miners can manipulate timestamps within ~15 seconds. Safe for timescales > 15 minutes, but risky for shorter intervals.',
-        evidence: `Line ${lineNum}: ${line.trim()}`,
-        location: `${filename}:${lineNum}`,
-        tool: 'chainscout-engine',
-        recommendation: 'Use block.timestamp only for coarse-grained timescales (> 15 minutes). For precise timing, use alternative mechanisms.',
-        references: ['https://solidity-by-example.org/hacks/block-timestamp-manipulation/'],
-      });
-    }
-  });
-  
-  return findings;
-}
-
-/**
- * Remove duplicate findings and consolidate similar issues
- */
-function deduplicateFindings(findings) {
-  const seen = new Set();
-  const deduplicated = [];
-  
-  findings.forEach(finding => {
-    const key = `${finding.category}-${finding.location}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      deduplicated.push(finding);
-    }
-  });
-  
-  return deduplicated;
-}
-
-// Export functions
-module.exports = { analyzeBytecodeViaInfura, contractExists, analyzeSolanaProgram, programExists,
-  analyzeSolidityCode,
-  detectReentrancy,
-  detectIntegerArithmetic,
-  detectTxOrigin,
-  detectUncheckedCalls,
-  detectDelegatecall,
-  detectAccessControl,
-  detectTimestampDependence,
-};
 
 // ============================================
 // INFURA INTEGRATION — Bytecode-based analysis
 // ============================================
-const { getContractBytecode, contractExists } = require("./infura-client");
+const { getContractBytecode, contractExists } = require('./infura-client');
 
-async function analyzeBytecodeViaInfura(address, chain = "mainnet") {
+async function analyzeBytecodeViaInfura(address, chain = 'mainnet') {
   const bytecode = await getContractBytecode(address, chain);
   const findings = [];
   
-  if (bytecode.includes("f4") || bytecode.includes("F4")) {
-    findings.push({
-      category: "Delegatecall Detected",
-      severity: "medium",
-      description: "Contract uses delegatecall (detected in bytecode). Verify target addresses are trusted.",
-    });
+  if (bytecode.includes('f4') || bytecode.includes('F4')) {
+    findings.push({ category: 'Delegatecall Detected', severity: 'medium', description: 'Contract uses delegatecall. Verify target addresses are trusted.' });
   }
   
-  if (bytecode.includes("ff") || bytecode.includes("FF")) {
-    findings.push({
-      category: "Selfdestruct Detected",
-      severity: "high",
-      description: "Contract contains selfdestruct opcode. Review authorization logic.",
-    });
+  if (bytecode.includes('ff') || bytecode.includes('FF')) {
+    findings.push({ category: 'Selfdestruct Detected', severity: 'high', description: 'Contract contains selfdestruct opcode. Review authorization.' });
   }
   
-  if (bytecode.includes("42") && bytecode.includes("43")) {
-    findings.push({
-      category: "Timestamp Usage",
-      severity: "low",
-      description: "Contract uses block.timestamp or block.number. Verify no critical logic depends on them.",
-    });
-  }
-  
-  return {
-    address,
-    chain,
-    bytecodeSize: bytecode.length / 2 - 1,
-    findings,
-    hasDelegatecall: bytecode.includes("f4") || bytecode.includes("F4"),
-    hasSelfdestruct: bytecode.includes("ff") || bytecode.includes("FF"),
-  };
+  return { address, chain, bytecodeSize: bytecode.length / 2 - 1, findings };
 }
+
 // ============================================
 // SOLANA INTEGRATION — Program analysis
 // ============================================
-const { getProgramInfo, programExists } = require("./solana-client");
+const { getProgramInfo, programExists } = require('./solana-client');
 
-async function analyzeSolanaProgram(programId, network = "mainnet") {
+async function analyzeSolanaProgram(programId, network = 'mainnet') {
   const info = await getProgramInfo(programId, network);
   const findings = [];
   
-  const UPGRADEABLE_LOADER = "BPFLoaderUpgradeab1e11111111111111111111111";
+  const UPGRADEABLE_LOADER = 'BPFLoaderUpgradeab1e11111111111111111111111';
   if (info.owner === UPGRADEABLE_LOADER) {
-    findings.push({
-      category: "Upgradeable Program",
-      severity: "medium",
-      description: "Program is upgradeable. Verify the upgrade authority is secure (multi-sig or governance).",
-      recommendation: "Use a multi-sig or governance-controlled upgrade authority.",
-    });
+    findings.push({ category: 'Upgradeable Program', severity: 'medium', description: 'Program is upgradeable. Verify upgrade authority is secure.' });
   }
   
   if (info.dataSize < 1000 && info.executable) {
-    findings.push({
-      category: "Small Program Size",
-      severity: "low",
-      description: "Program bytecode is very small. It might be a proxy pointing to another program.",
-      recommendation: "Verify the proxy destination is trusted.",
-    });
+    findings.push({ category: 'Small Program', severity: 'low', description: 'Program bytecode is very small. Might be a proxy.' });
   }
   
-  if (!info.executable) {
-    findings.push({
-      category: "Not Executable",
-      severity: "info",
-      description: "This account is not an executable program. It might be a regular account or data account.",
-    });
-  }
-  
-  return {
-    programId,
-    network,
-    executable: info.executable,
-    owner: info.owner,
-    dataSize: info.dataSize,
-    findings,
-    riskScore: findings.reduce((sum, f) => {
-      if (f.severity === "critical") return sum + 25;
-      if (f.severity === "high") return sum + 15;
-      if (f.severity === "medium") return sum + 10;
-      if (f.severity === "low") return sum + 5;
-      return sum + 1;
-    }, 0),
-  };
+  return { programId, network, executable: info.executable, findings, riskScore: findings.reduce((sum, f) => sum + (f.severity === 'medium' ? 10 : 5), 0) };
 }
+
+module.exports = {
+  analyzeSolidityCode,
+  analyzeBytecodeViaInfura,
+  analyzeSolanaProgram,
+};
