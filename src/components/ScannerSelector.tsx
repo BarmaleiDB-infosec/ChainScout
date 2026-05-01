@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { createScan, pollScan, type CreateScanRequest, type ScanJob, type ScanTargetType } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Bot, FileText, Globe, Loader2, Shield, Wallet, Zap } from "lucide-react";
+import { Bot, FileText, Globe, Loader2, Shield, Upload, Wallet, Zap } from "lucide-react";
 
 const targetTypes: Array<{
   id: ScanTargetType;
