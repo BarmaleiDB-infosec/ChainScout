@@ -530,6 +530,39 @@ app.use((error, req, res, next) => {
   next();
 });
 
+// ============================================
+// SOLANA SCAN ENDPOINT
+// ============================================
+app.post("/api/solana/scan", requireAuth, scanLimiter, async (req, res) => {
+  try {
+    const { programId, network = "mainnet" } = req.body;
+    if (!programId) {
+      return res.status(400).json({ ok: false, error: "Program ID is required" });
+    }
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(programId)) {
+      return res.status(400).json({ ok: false, error: "Invalid Solana program address" });
+    }
+    const result = await analyzeSolanaProgram(programId, network);
+    const { data: scan, error } = await supabaseAdmin
+      .from("scans")
+      .insert({
+        user_id: req.user.id,
+        target_type: "solana_program",
+        target_url: programId,
+        status: "completed",
+        risk_score: result.riskScore,
+        vulnerabilities: result.findings,
+        summary: `Solana program analysis: ${result.findings.length} findings`,
+      })
+      .select()
+      .single();
+    if (error) throw error;
+    res.json({ ok: true, scan, result });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`ChainScout server listening on ${port}`);
 });
