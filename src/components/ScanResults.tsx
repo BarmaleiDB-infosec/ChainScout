@@ -33,7 +33,7 @@ interface ScanResult {
     ai_analysis?: {
       executiveSummary?: string;
       criticalRisks?: Array<{ title: string; severity: string; recommendation: string }>;
-      remediationRoadmap?: string[];
+      remediationRoadmap?: Array<string | { step?: number; description?: string; codeExample?: string }>;
       trainingSignals?: string[];
     };
     limitations?: string[];
@@ -68,31 +68,21 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical':
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'high':
-        return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-      case 'medium':
-        return <Info className="w-5 h-5 text-yellow-500" />;
-      case 'low':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      default:
-        return null;
+      case 'critical': return <XCircle className="w-5 h-5 text-red-500" />;
+      case 'high': return <AlertTriangle className="w-5 h-5 text-orange-500" />;
+      case 'medium': return <Info className="w-5 h-5 text-yellow-500" />;
+      case 'low': return <CheckCircle className="w-5 h-5 text-green-500" />;
+      default: return null;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
-      case 'high':
-        return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
-      case 'medium':
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'low':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      default:
-        return '';
+      case 'critical': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'high': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+      case 'medium': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'low': return 'bg-green-500/10 text-green-500 border-green-500/20';
+      default: return '';
     }
   };
 
@@ -105,7 +95,6 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
       results: results,
       ai_analysis: aiSummary,
     };
-
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -119,7 +108,6 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.entries(severityBreakdown).map(([severity, count]) => (
           <Card key={severity} className="hover-lift glow-card">
@@ -134,7 +122,6 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
         ))}
       </div>
 
-      {/* Risk Score */}
       <Card className="glow-card">
         <CardHeader>
           <CardTitle>{t('riskAssessment')}</CardTitle>
@@ -148,20 +135,19 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
               <div className="h-4 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 transition-all duration-500"
-                  style={{ width: `${(resultsData.summary as Record<string, number>)?.riskScore || 0}%` }}
+                  style={{ width: `${resultsData.summary?.riskScore || 0}%` }}
                 />
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                {resultsData.summary && resultsData.summary.riskScore < 30 && t('lowRisk')}
-                {resultsData.summary && resultsData.summary.riskScore >= 30 && resultsData.summary.riskScore < 70 && t('mediumRisk')}
-                {resultsData.summary && resultsData.summary.riskScore >= 70 && t('highRisk')}
+                {(resultsData.summary?.riskScore || 0) < 30 && t('lowRisk')}
+                {(resultsData.summary?.riskScore || 0) >= 30 && (resultsData.summary?.riskScore || 0) < 70 && t('mediumRisk')}
+                {(resultsData.summary?.riskScore || 0) >= 70 && t('highRisk')}
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* AI Analysis */}
       {aiSummary && (
         <Card className="glow-card border-primary/20">
           <CardHeader>
@@ -178,7 +164,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
               <div className="mt-6 space-y-3">
                 <h4 className="font-semibold">{t('criticalRisks')}</h4>
                 {criticalRisks.map((risk, index) => (
-                  <div key={`${risk.title}-${index}`} className="rounded-lg border border-border/50 p-3">
+                  <div key={index} className="rounded-lg border border-border/50 p-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium">{risk.title}</p>
                       <Badge variant="outline" className={getSeverityColor(risk.severity)}>
@@ -205,8 +191,8 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
                 <h4 className="font-semibold mb-3">{t('remediationOrder')}</h4>
                 <div className="space-y-2">
                   {remediationRoadmap.map((step, index) => (
-                    <div key={`${step}-${index}`} className="rounded-lg bg-muted/40 p-3 text-sm">
-                      {index + 1}. {step}
+                    <div key={index} className="rounded-lg bg-muted/40 p-3 text-sm">
+                      {index + 1}. {typeof step === 'string' ? step : (step?.description || step?.step || '')}
                     </div>
                   ))}
                 </div>
@@ -218,9 +204,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
                 <h4 className="font-semibold mb-3">AI feedback loop</h4>
                 <div className="space-y-2">
                   {trainingSignals.map((signal, index) => (
-                    <p key={`${signal}-${index}`} className="text-sm text-muted-foreground">
-                      {signal}
-                    </p>
+                    <p key={index} className="text-sm text-muted-foreground">{signal}</p>
                   ))}
                 </div>
               </div>
@@ -231,9 +215,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
                 <h4 className="font-semibold mb-3">{t('analysisLimitations')}</h4>
                 <div className="space-y-2">
                   {limitations.map((limitation, index) => (
-                    <p key={`${limitation}-${index}`} className="text-sm text-muted-foreground">
-                      {limitation}
-                    </p>
+                    <p key={index} className="text-sm text-muted-foreground">{limitation}</p>
                   ))}
                 </div>
               </div>
@@ -242,10 +224,9 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
         </Card>
       )}
 
-      {/* Findings */}
       <Card className="glow-card">
-    <CardHeader className="flex flex-row items-center justify-between">
-      <CardTitle>{t('detectedVulnerabilities')} ({resultsData.findings?.length || 0})</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>{t('detectedVulnerabilities')} ({resultsData.findings?.length || 0})</CardTitle>
           <Button onClick={handleDownloadReport} variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             {t('downloadReportBtn')}
@@ -254,25 +235,25 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
         <CardContent>
           <div className="space-y-4">
             {resultsData.findings?.map((finding, index) => (
-              <Card key={(finding.id as string) || index} className={`border ${getSeverityColor(finding.severity as string)}`}>
+              <Card key={finding.id || index} className={`border ${getSeverityColor(finding.severity)}`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-3">
-                    {getSeverityIcon(finding.severity as string)}
+                    {getSeverityIcon(finding.severity)}
                     <div className="flex-1 space-y-2">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className="font-semibold text-foreground">{finding.title as string}</h4>
-                        <Badge variant="outline" className={getSeverityColor(finding.severity as string)}>
-                          {finding.severity as string}
+                        <h4 className="font-semibold text-foreground">{finding.title}</h4>
+                        <Badge variant="outline" className={getSeverityColor(finding.severity)}>
+                          {finding.severity}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{finding.description as string}</p>
+                      <p className="text-sm text-muted-foreground">{finding.description}</p>
                       {finding.evidence && (
                         <div className="rounded-lg bg-background/70 border border-border/50 p-3 text-xs text-muted-foreground">
                           {finding.evidence}
                         </div>
                       )}
                       {finding.location && (
-                        <p className="text-xs text-muted-foreground">📍 {finding.location as string}</p>
+                        <p className="text-xs text-muted-foreground">📍 {finding.location}</p>
                       )}
                       <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                         {finding.category && <Badge variant="secondary">{finding.category}</Badge>}
