@@ -6,18 +6,11 @@ const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 function safeJsonParse(value) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
+  try { return JSON.parse(value); } catch { return null; }
 }
 
 function parseJsonObject(value) {
-  if (typeof value !== 'string') {
-    return null;
-  }
-
+  if (typeof value !== 'string') return null;
   const text = value.trim();
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
@@ -27,18 +20,24 @@ function parseJsonObject(value) {
 
 function buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples }) {
   return [
-    'You are ChainScout, a senior web3 security analyst.',
-    'Produce a JSON object with keys: executiveSummary, criticalRisks, remediationRoadmap, trainingSignals.',
-    'Do not produce any additional commentary outside the JSON object.',
-    `Target type: ${targetType}`,
-    `Target url: ${targetUrl || 'uploaded artifact'}`,
-    `Source kind: ${sourceKind}`,
+    'You are a senior smart contract security auditor with 10+ years of experience.',
+    'Analyze the findings below and produce a JSON object with these keys:',
+    '- executiveSummary: 2-3 sentence summary of risk level and key issues',
+    '- criticalRisks: array of CRITICAL/HIGH findings with exploit scenario for each',
+    '- remediationRoadmap: SPECIFIC, NUMBERED steps with Solidity code examples for fixes',
+    '- trainingSignals: 2-3 suggestions for improving automated detection in future scans',
+    '',
+    'RULES:',
+    '- For each finding, provide a CONCRETE code fix (not generic advice)',
+    '- If finding is "coverage-limited" or "web3-surface", suggest specific manual checks',
+    '- Risk score 0-10: LOW, 11-40: MEDIUM, 41-70: HIGH, 71-100: CRITICAL',
+    '- Do not output anything outside the JSON object',
+    '',
+    `Target: ${targetUrl || 'uploaded artifact'} (${targetType}, ${sourceKind})`,
     `Scan level: ${level}`,
-    `Severity breakdown: ${JSON.stringify(vulnerabilities)}`,
-    `Tools used: ${JSON.stringify(toolsUsed)}`,
-    `Coverage: ${artifact ? artifact.kind : 'unknown'}`,
-    `Recent dataset examples: ${JSON.stringify(datasetExamples || [])}`,
-    `Findings: ${JSON.stringify(findings.slice(0, 20))}`,
+    `Risk score: ${vulnerabilities?.riskScore || 'N/A'}`,
+    `Tools: ${JSON.stringify(toolsUsed || ['chainscout'])}`,
+    `Findings (${findings?.length || 0}): ${JSON.stringify((findings || []).slice(0, 25))}`,
   ].join('\n');
 }
 
@@ -48,85 +47,60 @@ async function getOpenRouterAiAnalysis({ prompt, maxTokens }) {
     messages: [
       {
         role: 'system',
-        content: 'You write actionable web3 audit reports with security severity, exploitability guidance and remediation steps.',
+        content: 'You are a senior Web3 security auditor. You provide SPECIFIC, ACTIONABLE recommendations with code examples. You NEVER give generic advice. Every finding gets a concrete fix with Solidity/Rust code.',
       },
-      {
-        role: 'user',
-        content: prompt,
-      },
+      { role: 'user', content: prompt },
     ],
     maxTokens,
   });
-
   const content = response?.choices?.[0]?.message?.content || response?.output?.[0]?.content || '';
   return parseJsonObject(String(content));
 }
 
 async function getOpenAIAiAnalysis({ prompt, maxTokens }) {
-  if (!OPENAI_API_KEY) {
-    throw new Error('OPENAI_API_KEY is not configured');
-  }
-
-  const response = await axios.post(
-    'https://api.openai.com/v1/chat/completions',
-    {
-      model: OPENAI_MODEL,
-      messages: [
-        {
-          role: 'system',
-          content: 'You write actionable web3 audit reports with security severity, exploitability guidance and remediation steps.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.2,
-      top_p: 1,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
+  if (!OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not configured');
+  const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+    model: OPENAI_MODEL,
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a senior Web3 security auditor. You provide SPECIFIC, ACTIONABLE recommendations with code examples.',
       },
-      timeout: 25000,
-    }
-  );
-
+      { role: 'user', content: prompt },
+    ],
+    max_tokens: maxTokens,
+    temperature: 0.2,
+  }, {
+    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+    timeout: 25000,
+  });
   const content = response.data?.choices?.[0]?.message?.content || '';
   return parseJsonObject(String(content));
 }
 
 async function generateAiAnalysis({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples }) {
   const prompt = buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples });
-  const maxTokens = 1200;
+  const maxTokens = 2000;
 
   if (process.env.OPENROUTER_API_KEY) {
     try {
       const parsed = await getOpenRouterAiAnalysis({ prompt, maxTokens });
-      if (parsed?.executiveSummary) {
-        return parsed;
-      }
+      if (parsed?.executiveSummary) return parsed;
     } catch (error) {
-      console.warn('OpenRouter analysis failed:', error?.message || error);
+      console.warn('OpenRouter failed:', error?.message || error);
     }
   }
 
   if (process.env.OPENAI_API_KEY) {
     try {
       const parsed = await getOpenAIAiAnalysis({ prompt, maxTokens });
-      if (parsed?.executiveSummary) {
-        return parsed;
-      }
+      if (parsed?.executiveSummary) return parsed;
     } catch (error) {
-      console.warn('OpenAI analysis failed:', error?.message || error);
+      console.warn('OpenAI failed:', error?.message || error);
     }
   }
 
-  throw new Error('AI provider not available or failed to return a valid analysis');
+  throw new Error('AI provider not available');
 }
 
-module.exports = {
-  generateAiAnalysis,
-};
+module.exports = { generateAiAnalysis };
