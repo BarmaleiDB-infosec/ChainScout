@@ -72,7 +72,7 @@ async function getContractSourceCode(address, chain = 'mainnet') {
       constructorArguments: result.ConstructorArguments || '',
       proxy: result.Proxy === '1',
       implementation: result.Implementation || null,
-      verifiedAt: new Date(result.TimeStamp * 1000).toISOString(),
+      verifiedAt: result.TimeStamp ? new Date(result.TimeStamp * 1000).toISOString() : null,
     };
   } catch (error) {
     if (error.response?.status === 429) {
