@@ -35,8 +35,8 @@ const Dashboard = () => {
 
       const apiRows: DashboardScan[] = apiScans.map((scan) => ({
         id: scan.id,
-        target_url: scan.targetUrl || scan.report?.target.originalFilename || "Uploaded artifact",
-        scan_type: scan.targetType,
+        target_url: scan.target_url || scan.report?.target.originalFilename || "Uploaded artifact",
+        scan_type: scan.target_type,
         status: scan.status,
         results: scan.report
           ? {
@@ -51,7 +51,7 @@ const Dashboard = () => {
             }
           : null,
         ai_analysis: scan.report?.ai_analysis?.executiveSummary || scan.error || null,
-        created_at: scan.createdAt,
+        created_at: scan.created_at,
         source: "api",
       }));
 
