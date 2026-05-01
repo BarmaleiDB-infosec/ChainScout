@@ -44,8 +44,7 @@ async function getContractSourceCode(address, chain = 'mainnet') {
       timeout: 30000,
     });
 
-    const result = response.data?.result?.[0];
-    
+	const result = response.data?.result?.[0] || {};    
     // Enhanced error handling for unverified contracts
     if (!result) {
       throw new Error(
@@ -66,7 +65,7 @@ async function getContractSourceCode(address, chain = 'mainnet') {
       address: normalizedAddress,
       chain,
       name: result.ContractName,
-      sourceCode: parseSourceCode(result.SourceCode),
+      sourceCode: result.SourceCode ? parseSourceCode(result.SourceCode) : {},
       abi: result.ABI ? JSON.parse(result.ABI) : null,
       compilerVersion: result.CompilerVersion,
       isOptimized: result.OptimizationUsed === '1',
