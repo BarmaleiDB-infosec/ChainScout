@@ -39,6 +39,7 @@ async function getContractSourceCode(address, chain = 'mainnet') {
         action: 'getsourcecode',
         address: normalizedAddress,
         apikey: apiKey,
+        chainid: chain === "mainnet" ? 1 : chain === "sepolia" ? 11155111 : chain === "goerli" ? 5 : 1,
       },
       timeout: 30000,
     });
