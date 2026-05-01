@@ -5,7 +5,7 @@ const scanOrder = [];
 const MAX_SCANS = 100;
 
 function createScanJob(payload) {
-  const id = `scan_${randomUUID()}`;
+  const id = randomUUID();
   const now = new Date().toISOString();
   const job = {
     id,
