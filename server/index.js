@@ -553,7 +553,7 @@ app.post("/api/solana/scan", requireAuth, scanLimiter, async (req, res) => {
         status: "completed",
         risk_score: result.riskScore,
         vulnerabilities: result.findings,
-        summary: `Solana program analysis: ${result.findings.length} findings`,
+        report_text: `Solana program analysis: ${result.findings.length} findings`,
       })
       .select()
       .single();
