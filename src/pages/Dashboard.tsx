@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Shield, Plus, ExternalLink, Plug } from "lucide-react";
 import ScanResults from "@/components/ScanResults";
@@ -12,7 +11,6 @@ import { listRecentApiScans, type ScanJob } from "@/lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const { user } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
