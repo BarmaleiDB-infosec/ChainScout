@@ -113,14 +113,6 @@ const Dashboard = () => {
               <Plus className="h-4 w-4 mr-2" />
               {t('newScan')}
             </Button>
-            <Button 
-              variant="outline"
-              onClick={() => navigate('/integrations')}
-              className="interactive-button"
-            >
-              <Plug className="h-4 w-4 mr-2" />
-              {t('integrations')}
-            </Button>
           </div>
 
         {/* Recent Activity */}
