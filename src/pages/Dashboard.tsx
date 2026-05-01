@@ -76,7 +76,7 @@ const Dashboard = () => {
   }, [location.state]);
 
   useEffect(() => {
-    if (localStorage.getItem("access_token")) {
+    if (true) { // Always load scans
       loadRecentScans();
     }
   }, []);
