@@ -41,10 +41,10 @@ const Dashboard = () => {
         results: scan.report
           ? {
               summary: {
-                riskScore: scan.report.summary.riskScore,
-                totalFindings: scan.report.summary.totalFindings,
+                riskScore: scan.report?.summary?.riskScore,
+                totalFindings: scan.report?.summary?.totalFindings,
               },
-              vulnerabilities: scan.report.summary.severityBreakdown,
+              vulnerabilities: scan.report?.summary?.severityBreakdown,
               findings: scan.report.findings,
               report: scan.report,
               limitations: scan.report.limitations,
