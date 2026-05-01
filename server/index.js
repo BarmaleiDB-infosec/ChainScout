@@ -190,6 +190,7 @@ app.get('/api/db-test', requireAuth, scanLimiter, async (req, res) => {
   }
 });
 
+const { analyzeSolanaProgram } = require("./security-engine");
 const { runAnalysis, classifySource, normalizeLevel, normalizeTargetType } = require('./analyzer');
 const { createScanJob, updateScanJob, getScanJob, listRecentScans, toPublicScan } = require('./scan-store');
 
