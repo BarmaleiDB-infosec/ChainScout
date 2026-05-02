@@ -10,8 +10,12 @@
   <img src="https://img.shields.io/badge/engine-Slither%20%7C%20Heuristics-orange" alt="Engine">
 </p>
 
+
 **ChainScout** is an open-source platform for automated security analysis of Web3 projects.  
 Supports **Ethereum smart contracts**, **Solana programs**, and **dApp/Web3 applications** with AI-powered reporting.
+
+<img width="1805" height="824" alt="image" src="https://github.com/user-attachments/assets/f8d6a843-825b-4177-9475-ea2b6653d4df" />
+<img width="1548" height="867" alt="image" src="https://github.com/user-attachments/assets/aafe363d-c2f3-4ec1-865e-315ef5bc2530" />
 
 ---
 
