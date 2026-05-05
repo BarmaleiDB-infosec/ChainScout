@@ -63,8 +63,9 @@ services:
       - PORT=4000
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
       - DATABASE_URL=${DATABASE_URL:-postgresql://chainscout:chainscout@postgres:5432/chainscout}
-      - CORS_ORIGIN=http://localhost,http://localhost:80,http://localhost:443,http://31.128.47.250,https://localhost,https://app.chainscout.com,https://api.chainscout.com
+      - CORS_ORIGIN=http://localhost,http://localhost:80,http://localhost:443,http://31.128.47.250,http://chainscoutsecurity.com,https://chainscoutsecurity.com,https://localhost,https://app.chainscout.com,https://api.chainscout.com
       - API_REQUIRE_AUTH=${API_REQUIRE_AUTH:-true}
       - RATE_LIMIT_WINDOW_MS=900000
       - RATE_LIMIT_MAX=30

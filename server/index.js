@@ -264,7 +264,7 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
     });
     const result = await response.json();
     if (!response.ok) { return res.status(400).json({ ok: false, error: result.msg || 'Registration failed' }); }
-    res.json({ ok: true, user: result.user, access_token: result.access_token, refresh_token: result.refresh_token });
+    res.json({ ok: true, user: result.user, access_token: result.access_token, token: result.access_token, refresh_token: result.refresh_token });
   } catch (error) { res.status(500).json({ ok: false, error: error.message }); }
 });
 
@@ -280,7 +280,7 @@ app.post('/api/auth/login', scanLimiter, async (req, res) => {
     });
     const result = await response.json();
     if (!response.ok) { return res.status(400).json({ ok: false, error: result.error_description || 'Login failed' }); }
-    res.json({ ok: true, user: result.user, access_token: result.access_token, refresh_token: result.refresh_token });
+    res.json({ ok: true, user: result.user, access_token: result.access_token, token: result.access_token, refresh_token: result.refresh_token });
   } catch (error) { res.status(500).json({ ok: false, error: error.message }); }
 });
 
