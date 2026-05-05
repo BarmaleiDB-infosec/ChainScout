@@ -257,6 +257,7 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
     const { email, password } = req.body || {};
     if (!email || !password) { return res.status(400).json({ ok: false, error: 'Email and password are required' }); }
     const anonKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    console.log("DEBUG anonKey length:", anonKey?.length, "supabaseUrl:", supabaseUrl);
     const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': anonKey },
@@ -275,6 +276,7 @@ app.post('/api/auth/login', scanLimiter, async (req, res) => {
     const { email, password } = req.body || {};
     if (!email || !password) { return res.status(400).json({ ok: false, error: 'Email and password are required' }); }
     const anonKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    console.log("DEBUG anonKey length:", anonKey?.length, "supabaseUrl:", supabaseUrl);
     const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': anonKey },
