@@ -263,6 +263,8 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
       body: JSON.stringify({ email, password }),
     });
     const result = await response.json();
+    console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
+    console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
     if (!response.ok) { return res.status(400).json({ ok: false, error: result.msg || 'Registration failed' }); }
     res.json({ ok: true, user: result.user, access_token: result.access_token, token: result.access_token, refresh_token: result.refresh_token });
   } catch (error) { res.status(500).json({ ok: false, error: error.message }); }
@@ -279,6 +281,8 @@ app.post('/api/auth/login', scanLimiter, async (req, res) => {
       body: JSON.stringify({ email, password }),
     });
     const result = await response.json();
+    console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
+    console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
     if (!response.ok) { return res.status(400).json({ ok: false, error: result.error_description || 'Login failed' }); }
     res.json({ ok: true, user: result.user, access_token: result.access_token, token: result.access_token, refresh_token: result.refresh_token });
   } catch (error) { res.status(500).json({ ok: false, error: error.message }); }
