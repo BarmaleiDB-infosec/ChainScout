@@ -76,6 +76,8 @@ export const translations = {
     // OAuth / Web3
     connectEthereum: "Ethereum",
     connectSolana: "Solana",
+    connectGitHub: "GitHub",
+    connectGitHub: "GitHub",
     connecting: "Connecting...",
     walletError: "Failed to connect wallet",
     walletNotFound: "Wallet not found",
@@ -280,7 +282,7 @@ export const translations = {
     totalVulnerabilities: "Найдено уязвимостей",
     projectsScanned: "Проанализировано проектов",
   welcomeBack: "С возвращением",
-  monitorSecurity: "Отслеживайте ваши сканирования безопасности и управляйте подпиской",
+  monitorSecurity: "Отслеживайте ваши сканирования безопасности",
   newScan: "Новый скан",
   remaining: "оставшиеся",
     
@@ -305,6 +307,8 @@ export const translations = {
     // OAuth / Web3
     connectEthereum: "Ethereum",
     connectSolana: "Solana",
+    connectGitHub: "GitHub",
+    connectGitHub: "GitHub",
     connecting: "Подключение...",
     walletError: "Ошибка подключения кошелька",
     walletNotFound: "Кошелёк не найден",

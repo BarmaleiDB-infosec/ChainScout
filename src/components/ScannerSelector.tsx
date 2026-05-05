@@ -125,7 +125,7 @@ const ScannerSelector = () => {
       const job = await createScan(request);
       setActiveScan(job);
 
-      const finishedJob = await pollScan(job.id, { intervalMs: 5000, timeoutMs: 180000 });
+      const finishedJob = await pollScan(job.id, { intervalMs: 10000, timeoutMs: 180000 });
       setActiveScan(finishedJob);
 
       if (finishedJob.status === "failed") {
