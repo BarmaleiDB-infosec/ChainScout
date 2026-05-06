@@ -16,6 +16,7 @@ Supports **Ethereum smart contracts**, **Solana programs**, and **dApp/Web3 appl
 
 <img width="1805" height="824" alt="image" src="https://github.com/user-attachments/assets/f8d6a843-825b-4177-9475-ea2b6653d4df" />
 <img width="1548" height="867" alt="image" src="https://github.com/user-attachments/assets/aafe363d-c2f3-4ec1-865e-315ef5bc2530" />
+<img width="1183" height="634" alt="image" src="https://github.com/user-attachments/assets/62538a67-fac9-465e-926f-e2f09909fa61" />
 
 ---
 
