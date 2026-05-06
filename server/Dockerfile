@@ -12,6 +12,11 @@ RUN npm ci --only=production
 COPY . .
 
 # Create uploads directory
+# Install Python and Slither for AST analysis
+RUN apk add --no-cache python3 py3-pip
+RUN python3 -m venv /opt/venv
+RUN /opt/venv/bin/pip install slither-analyzer
+ENV SLITHER_BINARY="/opt/venv/bin/slither"
 RUN mkdir -p uploads
 
 # Expose API port

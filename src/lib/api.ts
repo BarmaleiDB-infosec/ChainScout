@@ -168,15 +168,20 @@ export async function pollScan(scanId: string, options?: { intervalMs?: number; 
   const intervalMs = options?.intervalMs ?? 2000;
   const timeoutMs = options?.timeoutMs ?? 120000;
   const startedAt = Date.now();
+  let attempt = 0;
 
   while (Date.now() - startedAt < timeoutMs) {
     const scan = await getScan(scanId);
     if (scan.status === "completed" || scan.status === "failed") {
       return scan;
     }
-    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    attempt++;
+    const delay = Math.min(intervalMs * Math.pow(2, attempt - 1), 30000);
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
+  throw new Error("Timeout while waiting for scan completion");
+}
   throw new Error("Timeout while waiting for scan completion");
 }
 
