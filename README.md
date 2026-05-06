@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/status-MVP%20Ready-brightgreen" alt="MVP Status">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/security-0%20critical%20CVEs-success" alt="Security">
-  <img src="https://img.shields.io/badge/detectors-7-coral" alt="Detectors">
+  <img src="https://img.shields.io/badge/detectors-critical%20attack%20vectors-coral" alt="Coverage">
   <img src="https://img.shields.io/badge/chains-Ethereum%20%7C%20Solana%20%7C%20BSC%20%7C%20Polygon-midnightblue" alt="Chains">
   <img src="https://img.shields.io/badge/AI-OpenRouter-purple" alt="AI">
   <img src="https://img.shields.io/badge/engine-Slither%20%7C%20Heuristics-orange" alt="Engine">
@@ -207,3 +207,15 @@ MIT License
 
 
 
+
+## Why ChainScout?
+
+| Feature | ChainScout | Slither | Mythril | Certora |
+|---------|-----------|---------|---------|---------|
+| **Browser-based** | ✅ No CLI needed | ❌ CLI only | ❌ CLI only | ❌ CLI only |
+| **AI-Powered Reports** | ✅ OpenRouter (Claude/GPT) | ❌ | ❌ | ❌ |
+| **Solana Support** | ✅ On-chain analysis | ❌ | ❌ | ❌ |
+| **DApp Surface Analysis** | ✅ Wallet SDK detection | ❌ | ❌ | ❌ |
+| **Risk Scoring** | ✅ 0–100 weighted | ❌ | ❌ | ❌ |
+| **Open Source** | ✅ MIT | ✅ AGPL | ✅ MIT | ❌ Proprietary |
+| **Setup Time** | 2 min (Docker) | 10 min | 15 min | Days |
