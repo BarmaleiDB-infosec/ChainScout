@@ -43,6 +43,17 @@ Supports **Ethereum smart contracts**, **Solana programs**, and **dApp/Web3 appl
 | 7 | **Timestamp Dependence** | LOW | Miner-manipulatable timestamps |
 
 ---
+## Why ChainScout?
+
+| Feature | ChainScout | Slither | Mythril | Certora |
+|---------|-----------|---------|---------|---------|
+| **Browser-based** | ✅ No CLI needed | ❌ CLI only | ❌ CLI only | ❌ CLI only |
+| **AI-Powered Reports** | ✅ OpenRouter (Claude/GPT) | ❌ | ❌ | ❌ |
+| **Solana Support** | ✅ On-chain analysis | ❌ | ❌ | ❌ |
+| **DApp Surface Analysis** | ✅ Wallet SDK detection | ❌ | ❌ | ❌ |
+| **Risk Scoring** | ✅ 0–100 weighted | ❌ | ❌ | ❌ |
+| **Open Source** | ✅ MIT | ✅ AGPL | ✅ MIT | ❌ Proprietary |
+| **Setup Time** | 2 min (Docker) | 10 min | 15 min | Days |
 
 ## Quick Start (Docker Compose)
 
@@ -204,18 +215,3 @@ MIT License
 
 **Built by the ChainScout Team | MVP Ready — May 2026**
 
-
-
-
-
-## Why ChainScout?
-
-| Feature | ChainScout | Slither | Mythril | Certora |
-|---------|-----------|---------|---------|---------|
-| **Browser-based** | ✅ No CLI needed | ❌ CLI only | ❌ CLI only | ❌ CLI only |
-| **AI-Powered Reports** | ✅ OpenRouter (Claude/GPT) | ❌ | ❌ | ❌ |
-| **Solana Support** | ✅ On-chain analysis | ❌ | ❌ | ❌ |
-| **DApp Surface Analysis** | ✅ Wallet SDK detection | ❌ | ❌ | ❌ |
-| **Risk Scoring** | ✅ 0–100 weighted | ❌ | ❌ | ❌ |
-| **Open Source** | ✅ MIT | ✅ AGPL | ✅ MIT | ❌ Proprietary |
-| **Setup Time** | 2 min (Docker) | 10 min | 15 min | Days |
