@@ -94,6 +94,8 @@ async function buildAuthHeaders(baseHeaders?: HeadersInit): Promise<Headers> {
   const headers = new Headers(baseHeaders || {});
   const token = localStorage.getItem("access_token");
   if (token) {
+  const lang = localStorage.getItem("chainscout_lang") || "ru";
+  headers.set("Accept-Language", lang);
     headers.set("Authorization", `Bearer ${token}`);
   }
   return headers;

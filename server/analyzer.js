@@ -865,6 +865,7 @@ async function buildAiAnalysis({ targetType, targetUrl, sourceKind, level, findi
       toolsUsed,
       artifact,
       datasetExamples,
+      language: process.env.AI_LANGUAGE || "ru",
     });
 
     if (aiAnalysis?.executiveSummary) {

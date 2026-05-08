@@ -18,7 +18,7 @@ function parseJsonObject(value) {
   return safeJsonParse(candidate);
 }
 
-function buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples }) {
+function buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vulnerabilities, toolsUsed, artifact, datasetExamples, language = "ru" }) {
   return [
     'Ты — senior аудитор смарт-контрактов. Пиши ТОЛЬКО на русском языке. Давай КОНКРЕТНЫЕ примеры кода Solidity для каждого исправления.',
     'Analyze the findings below and produce a JSON object with these keys:',
