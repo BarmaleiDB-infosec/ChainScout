@@ -911,7 +911,7 @@ function buildFallbackAiAnalysis({ targetType, targetUrl, findings, vulnerabilit
 
 async function commandExists(command, args) {
   try {
-    await spawnCommand(command, args, { timeoutMs: 5000 });
+    await spawnCommand(command, args, { timeoutMs: 15000 });
     return true;
   } catch {
     return false;
