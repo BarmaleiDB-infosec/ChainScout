@@ -138,6 +138,10 @@ const Auth = () => {
       if (address) {
         localStorage.setItem('wallet_address', address);
         localStorage.setItem('wallet_type', chain);
+        localStorage.setItem("access_token", "wallet_" + address);
+        localStorage.setItem("user_email", address);
+        localStorage.setItem("user_id", address);
+        window.location.href = "/dashboard";
       }
 
       toast({
