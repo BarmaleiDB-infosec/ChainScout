@@ -183,22 +183,6 @@ export async function pollScan(scanId: string, options?: { intervalMs?: number; 
   throw new Error("Timeout while waiting for scan completion");
 }
 
-export const checkDatabaseConnection = async () => {
-  try {
-    const response = await fetch(`${API_URL}/api/db-test`, {
-      headers: await buildAuthHeaders(),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { ok: false, error: data.error || "Database connection failed" };
-    }
-    return { ok: Boolean(data.ok) };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Network error";
-    return { ok: false, error: message };
-  }
-};
-
 export const healthCheck = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/health`);
