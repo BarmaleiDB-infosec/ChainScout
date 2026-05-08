@@ -27,7 +27,7 @@ async function sendOpenRouterChatCompletion({ model, messages, maxTokens = 1200 
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      timeout: 25000,
+      timeout: 10000,
     }
   );
 

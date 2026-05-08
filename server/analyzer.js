@@ -547,7 +547,7 @@ async function analyzeArtifact({ artifact, sourceKind, targetUrl, level, workspa
 
   if (solidityFiles.length) {
     // Try external tools first (Slither, Mythril)
-    findings.push(...(await runSlitherAnalysis(artifact.entryPath, level)));
+    if (level === "comprehensive" || level === "deep") { findings.push(...(await runSlitherAnalysis(artifact.entryPath))); }
     findings.push(...(await runMythrilAnalysis(solidityFiles[0], level)));
     
     // Always run built-in Security Engine for 7 vulnerability categories
