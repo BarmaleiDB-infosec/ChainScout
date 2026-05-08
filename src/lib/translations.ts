@@ -62,6 +62,7 @@ export const translations = {
     signUp: "Sign Up",
     email: "Email",
     emailPlaceholder: "Enter your email",
+    solanaPlaceholder: "Enter Solana program ID",
     password: "Password",
     passwordPlaceholder: "Enter your password",
     signingIn: "Signing in...",
@@ -102,6 +103,7 @@ export const translations = {
     // Scanner Target Types Descriptions
     websiteDescription: "URL of a website or web application for security analysis",
     contractDescription: "Smart contract address for blockchain analysis and security checks",
+    solanaDescription: "Solana program ID for on-chain program security analysis",
     blockchainDescription: "Blockchain protocol or network for comprehensive security audit",
     dappDescription: "Decentralized application address or repository for security review",
     defiDescription: "DeFi protocol address or smart contract code for vulnerability assessment",
@@ -406,6 +408,7 @@ export const translations = {
     // Scanner Target Types Descriptions
     websiteDescription: "URL веб-сайта или веб-приложения для анализа безопасности",
     contractDescription: "Адрес смарт-контракта на блокчейне для анализа и проверки безопасности",
+    solanaDescription: "ID программы Solana для анализа безопасности на блокчейне",
     blockchainDescription: "Протокол блокчейна или сеть для комплексного аудита безопасности",
     dappDescription: "Адрес децентрализованного приложения или репозиторий для проверки безопасности",
     defiDescription: "Адрес DeFi протокола или код смарт-контракта для оценки уязвимостей",

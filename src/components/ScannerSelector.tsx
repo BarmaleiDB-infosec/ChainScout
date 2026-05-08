@@ -29,9 +29,9 @@ const targetTypes: Array<{
   {
     id: "solana_program",
     label: "solanaProgram", // translation key  
-    description: "Solana program ID for on-chain program security analysis",
+    description: "solanaDescription",
     icon: Zap,
-    placeholder: "Enter Solana program ID",
+    placeholder: "solanaPlaceholder",
   },
   {
     id: "web3_project",
