@@ -2,8 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertTriangle, CheckCircle, Clock, TrendingUp, Shield, Bug } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const mockAnalyses = [
     {
       id: 1,
@@ -62,10 +64,10 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { label: "Всего сканирований", value: "1,247", icon: Shield, color: "text-primary" },
-    { label: "Найдено уязвимостей", value: "89", icon: Bug, color: "text-destructive" },
-    { label: "Устранено критических", value: "45", icon: CheckCircle, color: "text-cyber-green" },
-    { label: "Безопасность проектов", value: "94%", icon: TrendingUp, color: "text-cyber-blue" }
+    { label: t('totalScansLabel'), value: "1,247", icon: Shield, color: "text-primary" },
+    { label: t('vulnerabilitiesFoundLabel'), value: "89", icon: Bug, color: "text-destructive" },
+    { label: t('fixedCriticalLabel'), value: "45", icon: CheckCircle, color: "text-cyber-green" },
+    { label: t('projectsSecurityLabel'), value: "94%", icon: TrendingUp, color: "text-cyber-blue" }
   ];
 
   return (
@@ -73,10 +75,10 @@ const Dashboard = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 glow-text">
-            Панель управления
+            {t('controlPanel')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Централизованный контроль всех анализов безопасности ваших проектов
+            {t('centralizedControl')}
           </p>
         </div>
 
@@ -98,9 +100,9 @@ const Dashboard = () => {
         {/* Dashboard Mock */}
         <Card className="glow-card p-8 bg-gradient-card animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-semibold">Последние анализы</h3>
+            <h3 className="text-2xl font-semibold">{t('recentAnalyses')}</h3>
             <Badge className="bg-primary/20 text-primary border-primary/30">
-              Live Dashboard
+              {t('liveDashboard')}
             </Badge>
           </div>
 
@@ -108,12 +110,12 @@ const Dashboard = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border/50">
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Проект</th>
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Статус</th>
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Критичность</th>
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Уязвимости</th>
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Последнее сканирование</th>
-                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">Прогресс</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('project')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('status')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('severity')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('vulnerabilities')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('lastScanTime')}</th>
+                  <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('progress')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,12 +131,12 @@ const Dashboard = () => {
                     <td className="py-4 px-4">
                       <div className="flex items-center space-x-2">
                         {getStatusIcon(analysis.status)}
-                        <span className="capitalize">{analysis.status === 'completed' ? 'Завершен' : analysis.status === 'scanning' ? 'Сканируется' : 'Ожидает'}</span>
+                        <span className="capitalize">{analysis.status === 'completed' ? t('completed') : analysis.status === 'scanning' ? t('scanning') : t('pending')}</span>
                       </div>
                     </td>
                     <td className="py-4 px-4">
                       <Badge className={getSeverityColor(analysis.severity)}>
-                        {analysis.severity === 'high' ? 'Высокая' : analysis.severity === 'medium' ? 'Средняя' : analysis.severity === 'low' ? 'Низкая' : 'Неизвестно'}
+                        {analysis.severity === 'high' ? t('high') : analysis.severity === 'medium' ? t('medium') : analysis.severity === 'low' ? t('low') : t('unknown')}
                       </Badge>
                     </td>
                     <td className="py-4 px-4">

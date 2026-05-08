@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { createScan, pollScan, type CreateScanRequest, type ScanJob, type ScanTargetType } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Bot, FileText, Globe, Loader2, Shield, Upload, Wallet, Zap } from "lucide-react";
 
 const targetTypes: Array<{
@@ -20,33 +21,29 @@ const targetTypes: Array<{
 }> = [
   {
     id: "contract_address",
-    label: "Smart Contract",
-    description: "Contract address for analysis via explorer source and security checks",
+    label: "smartContract", // translation key
+    description: "contractDescription",
     icon: Wallet,
     placeholder: "0x742d35Cc6634C0532925a3b8D4C9db96590b5aF3",
   },
   {
     id: "solana_program",
-    label: "Solana Program",
+    label: "solanaProgram", // translation key  
     description: "Solana program ID for on-chain program security analysis",
     icon: Zap,
     placeholder: "Enter Solana program ID",
   },
   {
     id: "web3_project",
-    label: "DApp / Web3 Project",
-    description: "URL of a Web3 project or decentralized app for security review",
+    label: "dapp", // translation key
+    description: "dappDescription",
     icon: Globe,
     placeholder: "https://app.example.xyz",
   },
 ];
 
-const scanLevels = [
-  { id: "standard", label: "Стандартный", description: "Сбалансированный анализ", icon: Shield },
-  { id: "comprehensive", label: "Полный + AI", description: "Максимально подробный отчёт", icon: Zap },
-];
-
 const ScannerSelector = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -80,8 +77,8 @@ const ScannerSelector = () => {
   const handleStartScan = async () => {
     if (!localStorage.getItem("access_token")) {
       toast({
-        title: "Требуется вход",
-        description: "Войдите, чтобы запускать и сохранять сканы в дашборде.",
+        title: t('requiresLogin'),
+        description: t('loginToRun'),
         variant: "destructive",
       });
       navigate("/auth");
@@ -90,8 +87,8 @@ const ScannerSelector = () => {
 
     if (selectedTypeConfig?.acceptsFile && !selectedFile) {
       toast({
-        title: "Нужен файл",
-        description: "Загрузите файл или архив для выбранного режима анализа.",
+        title: t('selectFile'),
+        description: t('uploadFileArchive'),
         variant: "destructive",
       });
       return;
@@ -99,8 +96,8 @@ const ScannerSelector = () => {
 
     if (!selectedTypeConfig?.acceptsFile && !targetUrl.trim()) {
       toast({
-        title: "Нужна ссылка",
-        description: "Введите адрес смарт-контракта, ID Solana-программы или URL dApp.",
+        title: t('enterTarget'),
+        description: t('enterTargetAddress'),
         variant: "destructive",
       });
       return;
@@ -118,8 +115,8 @@ const ScannerSelector = () => {
 
     try {
       toast({
-        title: "Запускаем scan job",
-        description: "Готовим артефакты и подбираем движок анализа.",
+        title: t('startingJob'),
+        description: t('preparingArtifacts'),
       });
 
       const job = await createScan(request);
@@ -129,12 +126,12 @@ const ScannerSelector = () => {
       setActiveScan(finishedJob);
 
       if (finishedJob.status === "failed") {
-        throw new Error(finishedJob.error || "Сканирование завершилось с ошибкой");
+        throw new Error(finishedJob.error || t('unknownError'));
       }
 
       toast({
-        title: "Сканирование завершено",
-        description: "Подробный отчёт уже доступен на дашборде.",
+        title: t('analysisComplete'),
+        description: t('reportReady'),
       });
 
       navigate("/dashboard", {
@@ -143,9 +140,9 @@ const ScannerSelector = () => {
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Не удалось завершить сканирование";
+      const message = error instanceof Error ? error.message : t('unknownError');
       toast({
-        title: "Ошибка анализа",
+        title: t('analysisError'),
         description: message,
         variant: "destructive",
       });
@@ -160,10 +157,10 @@ const ScannerSelector = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 glow-text">
-              Сканер безопасности прямо в браузере
+              {t('scannerTitle')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Вставьте адрес контракта, ID Solana-программы или URL dApp. ChainScout прогонит артефакт через security pipeline и соберёт AI-отчёт с уязвимостями, severity и рекомендациями.
+              {t('scannerDescription')}
             </p>
           </div>
 
@@ -172,12 +169,12 @@ const ScannerSelector = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
                   <Shield className="w-6 h-6 text-primary" />
-                  Запустить сканирование
+                  {t('startScan')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="space-y-4">
-                  <p className="text-sm uppercase tracking-wide text-muted-foreground">Источник</p>
+                  <p className="text-sm uppercase tracking-wide text-muted-foreground">{t('source')}</p>
                   <RadioGroup
                     value={selectedTarget}
                     onValueChange={(value) => {
@@ -196,8 +193,8 @@ const ScannerSelector = () => {
                         <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
                         <type.icon className="w-5 h-5 text-primary mt-0.5" />
                         <div>
-                          <div className="font-semibold">{type.label}</div>
-                          <div className="text-sm text-muted-foreground">{type.description}</div>
+                          <div className="font-semibold">{t(type.label as any)}</div>
+                          <div className="text-sm text-muted-foreground">{t(type.description as any)}</div>
                         </div>
                       </Label>
                     ))}
@@ -205,7 +202,7 @@ const ScannerSelector = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm uppercase tracking-wide text-muted-foreground">Цель анализа</p>
+                  <p className="text-sm uppercase tracking-wide text-muted-foreground">{t('analysisTarget')}</p>
                   {selectedTypeConfig?.acceptsFile ? (
                     <div className="rounded-xl border border-dashed border-primary/40 bg-background/40 p-4">
                       <Input
@@ -216,12 +213,12 @@ const ScannerSelector = () => {
                         className="bg-transparent"
                       />
                       <p className="mt-3 text-sm text-muted-foreground">
-                        {selectedFile ? `Выбран файл: ${selectedFile.name}` : selectedTypeConfig?.placeholder}
+                        {selectedFile ? `${t('filePlaceholder')}${selectedFile.name}` : selectedTypeConfig?.placeholder}
                       </p>
                     </div>
                   ) : isPrefilledUrl && targetUrl.trim() ? (
                     <div className="rounded-xl border border-primary/40 bg-primary/10 p-4 flex flex-col gap-3">
-                      <div className="text-sm text-muted-foreground">URL взят из верхней секции</div>
+                      <div className="text-sm text-muted-foreground">{t('urlFromSection')}</div>
                       <div className="break-words font-medium text-foreground">{targetUrl}</div>
                       <Button
                         variant="secondary"
@@ -231,7 +228,7 @@ const ScannerSelector = () => {
                         }}
                         className="w-fit px-4 py-2"
                       >
-                        Изменить URL
+                        {t('changeUrl')}
                       </Button>
                     </div>
                   ) : (
@@ -251,22 +248,30 @@ const ScannerSelector = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-sm uppercase tracking-wide text-muted-foreground">Глубина анализа</p>
+                  <p className="text-sm uppercase tracking-wide text-muted-foreground">{t('analysisDepth')}</p>
                   <RadioGroup value={scanLevel} onValueChange={setScanLevel} className="grid gap-3 grid-cols-2">
-                    {scanLevels.map((level) => (
-                      <Label
-                        key={level.id}
-                        htmlFor={level.id}
-                        className="flex items-start gap-3 rounded-xl border border-border/60 p-4 cursor-pointer hover:border-primary/50 transition-colors"
-                      >
-                        <RadioGroupItem value={level.id} id={level.id} className="mt-1" />
-                        <level.icon className="w-5 h-5 text-primary mt-0.5" />
-                        <div>
-                          <div className="font-semibold">{level.label}</div>
-                          <div className="text-sm text-muted-foreground">{level.description}</div>
-                        </div>
-                      </Label>
-                    ))}
+                    <Label
+                      htmlFor="standard"
+                      className="flex items-start gap-3 rounded-xl border border-border/60 p-4 cursor-pointer hover:border-primary/50 transition-colors"
+                    >
+                      <RadioGroupItem value="standard" id="standard" className="mt-1" />
+                      <Shield className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <div className="font-semibold">{t('standard')}</div>
+                        <div className="text-sm text-muted-foreground">{t('standardDescription')}</div>
+                      </div>
+                    </Label>
+                    <Label
+                      htmlFor="comprehensive"
+                      className="flex items-start gap-3 rounded-xl border border-border/60 p-4 cursor-pointer hover:border-primary/50 transition-colors"
+                    >
+                      <RadioGroupItem value="comprehensive" id="comprehensive" className="mt-1" />
+                      <Zap className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <div className="font-semibold">{t('comprehensive')}</div>
+                        <div className="text-sm text-muted-foreground">{t('comprehensiveDescription')}</div>
+                      </div>
+                    </Label>
                   </RadioGroup>
                 </div>
 
@@ -274,12 +279,12 @@ const ScannerSelector = () => {
                   {isScanning ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Идёт анализ...
+                      {t('selectingEngine')}
                     </>
                   ) : (
                     <>
                       <Bot className="w-5 h-5 mr-2" />
-                      Запустить ChainScout Scan
+                      {t('startScanning')}
                     </>
                   )}
                 </Button>
@@ -291,12 +296,12 @@ const ScannerSelector = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <Bot className="w-5 h-5 text-primary" />
-                    Что делает AI слой
+                    {t('whatAIDoesTitle')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm text-muted-foreground">
-                  <p>AI не подменяет сканер, а объясняет findings, приоритизирует фиксы и собирает remediation roadmap.</p>
-                  <p>Каждый completed scan сохраняет structured signals для retrieval и улучшения следующих отчётов без опасного online self-training.</p>
+                  <p>{t('aiLayerDescription')}</p>
+                  <p>{t('aiSignalsDescription')}</p>
                 </CardContent>
               </Card>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface ScanTemplate {
 
 const ScanTemplates = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [templates, setTemplates] = useState<ScanTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -47,9 +49,9 @@ const ScanTemplates = () => {
       if (error) throw error;
       setTemplates(data || []);
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Ошибка загрузки шаблонов';
+      const message = error instanceof Error ? error.message : t('templateError');
       toast({
-        title: "Ошибка загрузки шаблонов",
+        title: t('templateError'),
         description: message,
         variant: "destructive",
       });
@@ -61,8 +63,8 @@ const ScanTemplates = () => {
   const createTemplate = async () => {
     if (!newTemplate.name.trim()) {
       toast({
-        title: "Ошибка",
-        description: "Введите название шаблона",
+        title: t('authErrorTitle'),
+        description: t('templateNameError'),
         variant: "destructive",
       });
       return;
@@ -82,8 +84,8 @@ const ScanTemplates = () => {
       if (error) throw error;
 
       toast({
-        title: "Шаблон создан",
-        description: "Шаблон успешно добавлен",
+        title: t('templateCreated'),
+        description: t('templateCreatedDesc'),
       });
 
       setNewTemplate({
@@ -95,9 +97,9 @@ const ScanTemplates = () => {
 
       loadTemplates();
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Ошибка создания шаблона';
+      const message = error instanceof Error ? error.message : t('templateCreateError');
       toast({
-        title: "Ошибка создания шаблона",
+        title: t('templateCreateError'),
         description: message,
         variant: "destructive",
       });
@@ -116,15 +118,15 @@ const ScanTemplates = () => {
       if (error) throw error;
 
       toast({
-        title: "Шаблон удален",
-        description: "Шаблон успешно удален",
+        title: t('templateDeleted'),
+        description: t('templateDeletedDesc'),
       });
 
       loadTemplates();
     } catch (error: Error | unknown) {
-      const message = error instanceof Error ? error.message : 'Ошибка удаления шаблона';
+      const message = error instanceof Error ? error.message : t('templateDeleteError');
       toast({
-        title: "Ошибка удаления шаблона",
+        title: t('templateDeleteError'),
         description: message,
         variant: "destructive",
       });
@@ -145,7 +147,7 @@ const ScanTemplates = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
-            Создать новый шаблон
+            {t('enterTemplateName')}
           </CardTitle>
           <CardDescription>
             Создайте шаблон для быстрого запуска повторяющихся сканирований

@@ -30,8 +30,8 @@ const Hero = () => {
   const handleAnalyze = async () => {
     if (!localStorage.getItem("access_token")) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, войдите для запуска анализа",
+        title: t('authErrorTitle'),
+        description: t('loginToRun'),
         variant: "destructive",
       });
       navigate('/auth');
@@ -43,8 +43,8 @@ const Hero = () => {
     try {
       document.getElementById("scanner-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
       toast({
-        title: "Добро пожаловать в сканер",
-        description: "Выберите источник и запустите анализ",
+        title: t('welcome'),
+        description: t('chooseType'),
       });
     } finally {
       setIsAnalyzing(false);
@@ -102,12 +102,12 @@ const Hero = () => {
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Запуск...
+                  {t('runningAnalysis')}
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5 mr-2" />
-                  Перейти к сканеру
+                  {t('goToScanner')}
                 </>
               )}
             </Button>

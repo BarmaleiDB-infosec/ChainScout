@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Github, Code, Zap, AlertCircle, Trash2, Plus } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -25,6 +26,7 @@ const PROVIDERS = [
 ];
 
 const IntegrationsManager = () => {
+  const { t } = useTranslation();
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingProvider, setAddingProvider] = useState<string | null>(null);
@@ -42,16 +44,16 @@ const IntegrationsManager = () => {
       setIntegrations(data || []);
     } catch (error: Error | unknown) {
       console.error('Error loading integrations:', error);
-      const message = error instanceof Error ? error.message : 'Не удалось загрузить интеграции';
+      const message = error instanceof Error ? error.message : t('loadError');
       toast({
-        title: "Ошибка",
+        title: t('authErrorTitle'),
         description: message,
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, t]);
 
   useEffect(() => {
     loadIntegrations();
@@ -60,8 +62,8 @@ const IntegrationsManager = () => {
   const handleAddIntegration = async (provider: string) => {
     if (!apiKey.trim()) {
       toast({
-        title: "Ошибка",
-        description: "Введите API ключ",
+        title: t('authErrorTitle'),
+        description: t('enterApiKeyError'),
         variant: "destructive",
       });
       return;
@@ -72,8 +74,8 @@ const IntegrationsManager = () => {
       
       if (!user) {
         toast({
-          title: "Ошибка",
-          description: "Необходимо войти в систему",
+          title: t('authErrorTitle'),
+          description: t('loginRequired'),
           variant: "destructive",
         });
         return;
@@ -91,8 +93,8 @@ const IntegrationsManager = () => {
       if (error) throw error;
 
       toast({
-        title: "Успешно",
-        description: `Интеграция ${provider} добавлена`,
+        title: t('successTitle'),
+        description: t('addedSuccess'),
       });
 
       setApiKey("");
@@ -100,9 +102,9 @@ const IntegrationsManager = () => {
       loadIntegrations();
     } catch (error: Error | unknown) {
       console.error('Error adding integration:', error);
-      const message = error instanceof Error ? error.message : 'Не удалось добавить интеграцию';
+      const message = error instanceof Error ? error.message : t('addError');
       toast({
-        title: "Ошибка",
+        title: t('authErrorTitle'),
         description: message,
         variant: "destructive",
       });
@@ -119,16 +121,16 @@ const IntegrationsManager = () => {
       if (error) throw error;
 
       toast({
-        title: "Успешно",
-        description: "Интеграция удалена",
+        title: t('successTitle'),
+        description: t('deleteSuccess'),
       });
 
       loadIntegrations();
     } catch (error: Error | unknown) {
       console.error('Error deleting integration:', error);
       toast({
-        title: "Ошибка",
-        description: "Не удалось удалить интеграцию",
+        title: t('authErrorTitle'),
+        description: t('deleteError'),
         variant: "destructive",
       });
     }
@@ -153,16 +155,16 @@ const IntegrationsManager = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Web3 Интеграции</CardTitle>
+        <CardTitle>{t('integrations')}</CardTitle>
         <CardDescription>
-          Подключите сервисы для расширенного анализа безопасности
+          {t('integrationsDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            API ключи используются только для интеграций анализа. Проверьте серверные политики хранения и шифрования перед использованием в production.
+            {t('apiKeysWarning')}
           </AlertDescription>
         </Alert>
 
@@ -182,7 +184,7 @@ const IntegrationsManager = () => {
                         <h4 className="font-semibold">{provider.name}</h4>
                         {integration && (
                           <Badge variant="default" className="text-xs">
-                            Подключено
+                            {t('connectedBadge')}
                           </Badge>
                         )}
                       </div>
@@ -192,17 +194,17 @@ const IntegrationsManager = () => {
 
                       {!integration && addingProvider === provider.id && (
                         <div className="space-y-2 mt-3">
-                          <Label htmlFor={`api-key-${provider.id}`}>API ключ</Label>
+                          <Label htmlFor={`api-key-${provider.id}`}>{t('apiKeyLabel')}</Label>
                           <div className="flex gap-2">
                             <Input
                               id={`api-key-${provider.id}`}
                               type="password"
-                              placeholder="Введите API ключ"
+                              placeholder={t('enterApiKey')}
                               value={apiKey}
                               onChange={(e) => setApiKey(e.target.value)}
                             />
                             <Button onClick={() => handleAddIntegration(provider.id)}>
-                              Сохранить
+                              {t('save')}
                             </Button>
                             <Button 
                               variant="outline" 
@@ -211,7 +213,7 @@ const IntegrationsManager = () => {
                                 setApiKey("");
                               }}
                             >
-                              Отмена
+                              {t('cancel')}
                             </Button>
                           </div>
                         </div>
@@ -219,7 +221,7 @@ const IntegrationsManager = () => {
 
                       {integration && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>API ключ: •••••••••{integration.api_key.slice(-4)}</span>
+                          <span>{t('apiKeyLabel')}: •••••••••{integration.api_key.slice(-4)}</span>
                         </div>
                       )}
                     </div>
@@ -242,7 +244,7 @@ const IntegrationsManager = () => {
                           onClick={() => setAddingProvider(provider.id)}
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          Добавить
+                          {t('addIntegration')}
                         </Button>
                       )
                     )}
