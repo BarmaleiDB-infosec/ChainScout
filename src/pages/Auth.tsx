@@ -27,11 +27,7 @@ const Auth = () => {
   const { connect, isConnecting } = useWallet();
   const [walletLoading, setWalletLoading] = useState<'ethereum' | 'solana' | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  // useEffect removed to prevent redirect loop
 
   useEffect(() => {
     if (authError) {
