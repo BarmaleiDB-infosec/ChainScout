@@ -38,6 +38,10 @@ export default function AuthCallback() {
 
         // Session established successfully, redirect to dashboard
         console.log('OAuth authentication successful');
+        localStorage.setItem("access_token", data.session.access_token);
+        localStorage.setItem("refresh_token", data.session.refresh_token || "");
+        localStorage.setItem("user_email", data.session.user.email || "");
+        localStorage.setItem("user_id", data.session.user.id);
         navigate('/dashboard', { replace: true });
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Authentication failed';
