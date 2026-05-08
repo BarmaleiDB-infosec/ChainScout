@@ -182,10 +182,8 @@ export async function pollScan(scanId: string, options?: { intervalMs?: number; 
 
   throw new Error("Timeout while waiting for scan completion");
 }
-  throw new Error("Timeout while waiting for scan completion");
-}
 
-export const checkDatabaseConnection = async (): Promise<{ ok: boolean; error?: string }> => {
+export const checkDatabaseConnection = async () => {
   try {
     const response = await fetch(`${API_URL}/api/db-test`, {
       headers: await buildAuthHeaders(),
