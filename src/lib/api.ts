@@ -166,7 +166,7 @@ export async function analyzeTarget(request: CreateScanRequest): Promise<{ ok: b
 
 export async function pollScan(scanId: string, options?: { intervalMs?: number; timeoutMs?: number }): Promise<ScanJob> {
   const intervalMs = options?.intervalMs ?? 2000;
-  const timeoutMs = options?.timeoutMs ?? 120000;
+  const timeoutMs = options?.timeoutMs ?? 300000;
   const startedAt = Date.now();
   let attempt = 0;
 

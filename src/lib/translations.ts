@@ -22,6 +22,7 @@ export const translations = {
     // Target Types
     website: "Website",
     smartContract: "Smart Contract",
+    solanaProgram: "Solana Program",
     blockchain: "Blockchain",
     dapp: "DApp",
     defi: "DeFi Protocol",
@@ -328,6 +329,7 @@ export const translations = {
     // Target Types
     website: "Веб-сайт",
     smartContract: "Смарт-контракт",
+    solanaProgram: "Программа Solana",
     blockchain: "Блокчейн",
     dapp: "DApp",
     defi: "DeFi протокол",
