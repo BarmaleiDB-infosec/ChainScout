@@ -5,7 +5,7 @@ export const translations = {
     register: "Get Started",
     
     // Hero section
-    title: "ChainScout — Security Analysis by ChainScout",
+    title: "ChainScout — Security Analysis by ChainScout Security",
     subtitle: "Comprehensive security auditing for blockchain and web projects. Analyze smart contracts, web applications, dApps, and DeFi protocols with AI-powered insights from ChainScout's security platform.",
     startAnalysis: "Start Analysis",
     supportedTypes: "Supports: Web Applications, Smart Contracts, DApps, DeFi Protocols, NFT Projects, Blockchain Projects",
