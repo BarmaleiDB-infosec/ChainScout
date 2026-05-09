@@ -305,6 +305,14 @@ export const translations = {
     templateDeletedDesc: "Template deleted successfully",
     enterTemplateName: "Enter template name",
     templateNameError: "Enter template name",
+    
+    // Manual Audit
+    orderManualAudit: "Order Manual Audit",
+    manualAuditTitle: "Order Manual Audit",
+    manualAuditDescription: "We can perform a professional pentest of your website or Web3 project. Our specialists will check smart contracts, dApps, APIs, and infrastructure for vulnerabilities.",
+    contactUs: "Contact us:",
+    telegramContact: "Telegram: @chainscoutsecurity",
+    emailContact: "Email: barmacrpt534@gmail.com",
   },
   ru: {
     // Header  
@@ -611,6 +619,14 @@ export const translations = {
     templateDeletedDesc: "Шаблон успешно удален",
     enterTemplateName: "Введите название шаблона",
     templateNameError: "Введите название шаблона",
+    
+    // Manual Audit
+    orderManualAudit: "Заказать ручной аудит",
+    manualAuditTitle: "Заказать ручной аудит",
+    manualAuditDescription: "Мы можем провести профессиональный пентест вашего веб-сайта или Web3-проекта. Наши специалисты проверят смарт-контракты, dApp, API и инфраструктуру на уязвимости.",
+    contactUs: "Свяжитесь с нами:",
+    telegramContact: "Telegram: @chainscoutsecurity",
+    emailContact: "Email: barmacrpt534@gmail.com",
   }
 };
 
