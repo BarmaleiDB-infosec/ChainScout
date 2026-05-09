@@ -43,6 +43,14 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+  bot:
+    build: /opt/chainscout-bot
+    container_name: chainscout-bot
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+    restart: unless-stopped
+    networks:
+      - chainscout-network
 
   # Node.js Backend API
   api:

@@ -5,8 +5,8 @@ export const translations = {
     register: "Get Started",
     
     // Hero section
-    title: "ChainScout — Security Analysis by ChainGuard",
-    subtitle: "Comprehensive security auditing for blockchain and web projects. Analyze smart contracts, web applications, dApps, and DeFi protocols with AI-powered insights from ChainGuard's security platform.",
+    title: "ChainScout — Security Analysis by ChainScout",
+    subtitle: "Comprehensive security auditing for blockchain and web projects. Analyze smart contracts, web applications, dApps, and DeFi protocols with AI-powered insights from ChainScout's security platform.",
     startAnalysis: "Start Analysis",
     supportedTypes: "Supports: Web Applications, Smart Contracts, DApps, DeFi Protocols, NFT Projects, Blockchain Projects",
     
@@ -38,9 +38,9 @@ export const translations = {
     
     // Main Content
     aboutUs: "About ChainScout",
-    aboutDescription: "ChainScout is a powerful security analysis tool developed by ChainGuard — a cutting-edge cybersecurity platform specializing in blockchain and web security. ChainScout provides automated and static analysis for applications and blockchain projects, helping developers identify vulnerabilities in smart contracts, web applications, dApps, and DeFi protocols before they become critical security issues.",
-    ourMission: "ChainGuard Mission",
-    missionDescription: "ChainGuard's mission is to provide comprehensive security solutions, intelligence tools, and automated systems for the decentralized world. Through ChainScout, we offer professional security reviews, vulnerability assessments, manual testing by certified professionals, and real-time monitoring to ensure maximum cybersecurity for projects of any scale. Our platform combines automation, AI-powered analysis, and expert knowledge to protect the Web3 ecosystem.",
+    aboutDescription: "ChainScout is a powerful security analysis tool developed by ChainScout — a cutting-edge cybersecurity platform specializing in blockchain and web security. ChainScout provides automated and static analysis for applications and blockchain projects, helping developers identify vulnerabilities in smart contracts, web applications, dApps, and DeFi protocols before they become critical security issues.",
+    ourMission: "ChainScout Mission",
+    missionDescription: "ChainScout's mission is to provide comprehensive security solutions, intelligence tools, and automated systems for the decentralized world. Through ChainScout, we offer professional security reviews, vulnerability assessments, manual testing by certified professionals, and real-time monitoring to ensure maximum cybersecurity for projects of any scale. Our platform combines automation, AI-powered analysis, and expert knowledge to protect the Web3 ecosystem.",
     analysisResults: "Analysis Results",
     yourReports: "Your Reports",
     noResults: "No analysis results yet. Start your first security scan to see detailed vulnerability reports and recommendations.",
@@ -58,7 +58,7 @@ export const translations = {
     
     // Auth
     welcome: "Welcome to ChainScout",
-    signInDescription: "Security analysis tool by ChainGuard — protect your projects with advanced AI analysis",
+    signInDescription: "Security analysis tool by ChainScout — protect your projects with advanced AI analysis",
     signIn: "Sign In",
     signUp: "Sign Up",
     email: "Email",
@@ -321,8 +321,8 @@ export const translations = {
     register: "Начать",
     
     // Hero section
-    title: "ChainScout — анализ безопасности от ChainGuard",
-    subtitle: "Комплексный аудит безопасности блокчейна и веб-проектов. Анализируйте смарт-контракты, веб-приложения, DApps и DeFi протоколы с помощью ИИ-аналитики платформы ChainGuard.",
+    title: "ChainScout — анализ безопасности от ChainScout",
+    subtitle: "Комплексный аудит безопасности блокчейна и веб-проектов. Анализируйте смарт-контракты, веб-приложения, DApps и DeFi протоколы с помощью ИИ-аналитики платформы ChainScout.",
     startAnalysis: "Начать анализ",
     supportedTypes: "Поддерживаются: веб-приложения, смарт-контракты, DApps, DeFi протоколы, NFT проекты, блокчейн-проекты",
     
@@ -354,9 +354,9 @@ export const translations = {
     
     // Main Content
     aboutUs: "О ChainScout",
-    aboutDescription: "ChainScout — мощный инструмент анализа безопасности, разработанный ChainGuard, передовой платформой кибербезопасности, специализирующейся на защите блокчейна и веб-приложений. ChainScout выполняет автоматический и статический анализ приложений и блокчейн-проектов, помогая разработчикам выявлять уязвимости в смарт-контрактах, веб-приложениях, DApps и DeFi протоколах до того, как они станут критическими проблемами безопасности.",
-    ourMission: "Миссия ChainGuard",
-    missionDescription: "Миссия ChainGuard — обеспечить комплексные решения в области безопасности, инструменты аналитики и автоматизированные системы для децентрализованного мира. Через ChainScout мы предлагаем профессиональные проверки безопасности, оценку уязвимостей, ручное тестирование сертифицированными специалистами и мониторинг в реальном времени для обеспечения максимальной кибербезопасности проектов любого масштаба. Наша платформа объединяет автоматизацию, ИИ-анализ и экспертные знания для защиты экосистемы Web3.",
+    aboutDescription: "ChainScout — мощный инструмент анализа безопасности, разработанный ChainScout, передовой платформой кибербезопасности, специализирующейся на защите блокчейна и веб-приложений. ChainScout выполняет автоматический и статический анализ приложений и блокчейн-проектов, помогая разработчикам выявлять уязвимости в смарт-контрактах, веб-приложениях, DApps и DeFi протоколах до того, как они станут критическими проблемами безопасности.",
+    ourMission: "Миссия ChainScout",
+    missionDescription: "Миссия ChainScout — обеспечить комплексные решения в области безопасности, инструменты аналитики и автоматизированные системы для децентрализованного мира. Через ChainScout мы предлагаем профессиональные проверки безопасности, оценку уязвимостей, ручное тестирование сертифицированными специалистами и мониторинг в реальном времени для обеспечения максимальной кибербезопасности проектов любого масштаба. Наша платформа объединяет автоматизацию, ИИ-анализ и экспертные знания для защиты экосистемы Web3.",
     analysisResults: "Результаты анализа",
     yourReports: "Ваши отчёты",
     noResults: "Пока нет результатов анализа. Запустите первое сканирование безопасности, чтобы увидеть подробные отчёты об уязвимостях и рекомендации.",
@@ -374,7 +374,7 @@ export const translations = {
     
     // Auth
     welcome: "Добро пожаловать в ChainScout",
-    signInDescription: "Инструмент анализа безопасности от ChainGuard — защитите свои проекты с помощью передового ИИ-анализа",
+    signInDescription: "Инструмент анализа безопасности от ChainScout — защитите свои проекты с помощью передового ИИ-анализа",
     signIn: "Войти",
     signUp: "Зарегистрироваться",
     email: "Электронная почта",

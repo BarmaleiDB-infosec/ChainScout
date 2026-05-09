@@ -34,7 +34,7 @@ function detectIntegerArithmetic(sourceCode, lines, filename) {
   for (const pattern of patterns) {
     let match;
     while ((match = pattern.exec(sourceCode)) !== null) {
-      if (!sourceCode.includes('SafeMath') && !sourceCode.includes('unchecked')) {
+        if (!sourceCode.includes('SafeMath') && !sourceCode.includes('DSMath') && !sourceCode.includes('SafeMathLib') && !sourceCode.includes('unchecked')) {
         const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
         findings.push({
           category: 'Integer Overflow/Underflow',
@@ -119,7 +119,7 @@ function detectAccessControl(sourceCode, lines, filename) {
       const funcEnd = sourceCode.indexOf('{', funcStart);
       const funcBody = sourceCode.substring(funcStart, funcEnd + 1);
       
-      if (!funcBody.includes('onlyOwner') && !funcBody.includes('require(')) {
+        if (!funcBody.includes('onlyOwner') && !funcBody.includes('auth') && !funcBody.includes('wards') && !funcBody.includes('require(')) {
         const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
         findings.push({
           category: 'Access Control',
