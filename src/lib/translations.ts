@@ -311,8 +311,9 @@ export const translations = {
     manualAuditTitle: "Order Manual Audit",
     manualAuditDescription: "We can perform a professional pentest of your website or Web3 project. Our specialists will check smart contracts, dApps, APIs, and infrastructure for vulnerabilities.",
     contactUs: "Contact us:",
-    telegramContact: "Telegram: @chainscoutsecurity",
+    telegramContact: "Telegram: @chainscoutsupport_bot",
     emailContact: "Email: barmacrpt534@gmail.com",
+    emailCopied: "Email copied to clipboard",
   },
   ru: {
     // Header  
@@ -625,8 +626,9 @@ export const translations = {
     manualAuditTitle: "Заказать ручной аудит",
     manualAuditDescription: "Мы можем провести профессиональный пентест вашего веб-сайта или Web3-проекта. Наши специалисты проверят смарт-контракты, dApp, API и инфраструктуру на уязвимости.",
     contactUs: "Свяжитесь с нами:",
-    telegramContact: "Telegram: @chainscoutsecurity",
+    telegramContact: "Telegram: @chainscoutsupport_bot",
     emailContact: "Email: barmacrpt534@gmail.com",
+    emailCopied: "Email скопирован в буфер обмена",
   }
 };
 

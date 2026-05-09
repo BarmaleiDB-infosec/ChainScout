@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,14 +13,21 @@ import { Shield, Send, Mail } from "lucide-react";
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleTelegram = () => {
-    window.open("https://t.me/chainscoutsecurity", "_blank");
+    window.open("https://t.me/chainscoutsupport_bot", "_blank");
   };
 
   const handleEmail = () => {
-    window.open("mailto:barmacrpt534@gmail.com", "_blank");
+    const email = "barmacrpt534@gmail.com";
+    navigator.clipboard.writeText(email).then(() => {
+      toast({
+        title: "Success",
+        description: t("emailCopied"),
+      });
+    });
   };
 
   return (
