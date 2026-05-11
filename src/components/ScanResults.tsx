@@ -163,7 +163,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
             {criticalRisks.length > 0 && (
               <div className="mt-6 space-y-3">
                 <h4 className="font-semibold">{t('criticalRisks')}</h4>
-                {criticalRisks.map((risk, index) => (
+                {Array.isArray(criticalRisks) && criticalRisks.map((risk, index) => (
                   <div key={index} className="rounded-lg border border-border/50 p-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium">{risk.title}</p>
@@ -203,7 +203,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
               <div>
                 <h4 className="font-semibold mb-3">AI feedback loop</h4>
                 <div className="space-y-2">
-                  {trainingSignals.map((signal, index) => (
+                  {Array.isArray(trainingSignals) && trainingSignals.map((signal, index) => (
                     <p key={index} className="text-sm text-muted-foreground">{signal}</p>
                   ))}
                 </div>
@@ -214,7 +214,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
               <div>
                 <h4 className="font-semibold mb-3">{t('analysisLimitations')}</h4>
                 <div className="space-y-2">
-                  {limitations.map((limitation, index) => (
+                  {Array.isArray(limitations) && limitations.map((limitation, index) => (
                     <p key={index} className="text-sm text-muted-foreground">{limitation}</p>
                   ))}
                 </div>
@@ -234,7 +234,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {resultsData.findings?.map((finding, index) => (
+            {Array.isArray(resultsData?.findings) && resultsData.findings.map((finding, index) => (
               <Card key={finding.id || index} className={`border ${getSeverityColor(finding.severity)}`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-3">
