@@ -55,7 +55,7 @@ const Dashboard = () => {
         source: "api",
       }));
 
-      const sorted = apiRows.sort(
+      const sorted = apiRows.filter(s => s.status === "completed" || s.status === "failed").sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 

@@ -62,7 +62,7 @@ const ScanResults = ({ scan }: ScanResultsProps) => {
   const severityBreakdown = resultsData.summary?.severityBreakdown || resultsData.vulnerabilities || {};
   const aiSummary = resultsData.report?.ai_analysis?.executiveSummary || ai_analysis || "";
   const criticalRisks = resultsData.report?.ai_analysis?.criticalRisks || [];
-  const remediationRoadmap = resultsData.report?.ai_analysis?.remediationRoadmap || [];
+  const remediationRoadmap = Array.isArray(resultsData.report?.ai_analysis?.remediationRoadmap) ? resultsData.report?.ai_analysis?.remediationRoadmap : [];
   const trainingSignals = resultsData.report?.ai_analysis?.trainingSignals || [];
   const limitations = resultsData.report?.limitations || [];
 

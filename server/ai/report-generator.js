@@ -41,7 +41,7 @@ function buildAiPrompt({ targetType, targetUrl, sourceKind, level, findings, vul
     '- Исправление: использовать immutable для адреса библиотеки, проверять код',
     '',
     'INTEGER OVERFLOW:',
-    '- PoWH Coin (2018): арифметическое переполнение через '+=' 
+    '- PoWH Coin (2018): арифметическое переполнение через оператор сложения-присваивания',
     '- BeautyChain (2018): переполнение uint256 через умножение',
     '- Исправление: Solidity 0.8+ или SafeMath библиотека',
     '',
