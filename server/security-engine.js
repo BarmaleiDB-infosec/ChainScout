@@ -184,6 +184,13 @@ function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
   findings.push(...detectTimestampDependence(sourceCode, lines, filename));
   
   findings = deduplicate(findings);
+  findings.push(...detectUncheckedReturnValue(sourceCode, lines, filename));
+  findings.push(...detectFrontRunning(sourceCode, lines, filename));
+  findings.push(...detectUnprotectedSelfdestruct(sourceCode, lines, filename));
+  findings.push(...detectMissingZeroAddressCheck(sourceCode, lines, filename));
+  findings.push(...detectStorageCollision(sourceCode, lines, filename));
+  
+  findings = deduplicate(findings);
   
   const severityScore = { critical: 25, high: 15, medium: 10, low: 5, info: 1 };
   const riskScore = Math.min(100, findings.reduce((sum, f) => sum + (severityScore[f.severity] || 1), 0));
@@ -191,6 +198,109 @@ function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
   return { filename, findings, totalFindings: findings.length, riskScore };
 }
 
+function detectUncheckedReturnValue(sourceCode, lines, filename) {
+  const findings = [];
+  const patterns = [/\.call\s*\{/g, /\.delegatecall\s*\{/g, /\.staticcall\s*\{/g];
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      const after = sourceCode.substring(match.index, match.index + 200);
+      if (!after.includes('require(') && !after.includes('if (')) {
+        const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+        findings.push({
+          category: 'Unchecked Return Value',
+          severity: 'high',
+          description: `Low-level call without return value check in ${filename}:${lineIndex}`,
+          location: `${filename}:${lineIndex}`,
+          recommendation: 'Always check return values of low-level calls with require(success, "Call failed").',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function detectFrontRunning(sourceCode, lines, filename) {
+  const findings = [];
+  const pattern = /require\s*\(\s*\w+\s*\.\s*balance\s*>=/g;
+  let match;
+  while ((match = pattern.exec(sourceCode)) !== null) {
+    const after = sourceCode.substring(match.index, match.index + 300);
+    if (after.includes('balance') && (after.includes(' -= ') || after.includes(' -= '))) {
+      const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+      findings.push({
+        category: 'Potential Front-running',
+        severity: 'medium',
+        description: `Balance check before state change in ${filename}:${lineIndex}. Vulnerable to front-running.`,
+        location: `${filename}:${lineIndex}`,
+        recommendation: 'Update state before external calls (Checks-Effects-Interactions pattern).',
+      });
+    }
+  }
+  return findings;
+}
+
+function detectUnprotectedSelfdestruct(sourceCode, lines, filename) {
+  const findings = [];
+  if (sourceCode.includes('selfdestruct') || sourceCode.includes('suicide')) {
+    const funcStart = sourceCode.lastIndexOf('function ', sourceCode.indexOf('selfdestruct'));
+    const funcBody = sourceCode.substring(funcStart, sourceCode.indexOf('{', funcStart) + 300);
+    if (!funcBody.includes('onlyOwner') && !funcBody.includes('require(') && !funcBody.includes('auth')) {
+      const lineIndex = sourceCode.substring(0, Math.max(0, funcStart)).split('\n').length;
+      findings.push({
+        category: 'Unprotected Selfdestruct',
+        severity: 'critical',
+        description: `selfdestruct without access control in ${filename}:${lineIndex}`,
+        location: `${filename}:${lineIndex}`,
+        recommendation: 'Add onlyOwner modifier to selfdestruct function.',
+      });
+    }
+  }
+  return findings;
+}
+
+function detectMissingZeroAddressCheck(sourceCode, lines, filename) {
+  const findings = [];
+  const patterns = [/\.transfer\s*\(/g, /\.send\s*\(/g, /\btransfer\s*\(/g];
+  
+  for (const pattern of patterns) {
+    let match;
+    while ((match = pattern.exec(sourceCode)) !== null) {
+      const context = sourceCode.substring(Math.max(0, match.index - 50), match.index + 100);
+      if (!context.includes('address(0)') && !context.includes('0x0') && !context.includes('zero')) {
+        const lineIndex = sourceCode.substring(0, match.index).split('\n').length;
+        findings.push({
+          category: 'Missing Zero Address Check',
+          severity: 'medium',
+          description: `Transfer without zero-address validation in ${filename}:${lineIndex}`,
+          location: `${filename}:${lineIndex}`,
+          recommendation: 'Add require(to != address(0)) before transfer.',
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function detectStorageCollision(sourceCode, lines, filename) {
+  const findings = [];
+  if (sourceCode.includes('delegatecall')) {
+    const hasImmutable = sourceCode.includes('immutable');
+    const hasStorageVars = /uint\s+\w+\s*(=|;)/g.test(sourceCode) || /address\s+\w+\s*(=|;)/g.test(sourceCode);
+    if (!hasImmutable && hasStorageVars) {
+      const lineIndex = sourceCode.substring(0, sourceCode.indexOf('delegatecall')).split('\n').length;
+      findings.push({
+        category: 'Storage Collision Risk',
+        severity: 'high',
+        description: `delegatecall with mutable storage variables in ${filename}:${lineIndex}`,
+        location: `${filename}:${lineIndex}`,
+        recommendation: 'Use immutable for delegatecall target address or implement storage gap.',
+      });
+    }
+  }
+  return findings;
+}
 // ============================================
 // INFURA INTEGRATION — Bytecode-based analysis
 // ============================================
