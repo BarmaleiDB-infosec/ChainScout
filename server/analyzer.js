@@ -555,6 +555,9 @@ async function analyzeArtifact({ artifact, sourceKind, targetUrl, level, workspa
       try {
         const code = await fsp.readFile(solidityFile, 'utf-8');
         const engineFindings = await analyzeSolidityCode(code, solidityFile);
+        findings.push(...engineFindings.findings);
+      } catch (error) {
+        console.warn(`Failed to analyze ${solidityFile}:`, error?.message || error);
       }
     }
     

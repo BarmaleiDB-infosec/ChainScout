@@ -286,6 +286,11 @@ function deduplicate(findings) {
   return unique;
 }
 
+const timeout = (prom, ms) => Promise.race([
+  prom,
+  new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms)),
+]);
+
 async function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
   const lines = sourceCode.split('\n');
   let findings = [];
@@ -301,11 +306,19 @@ async function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
     detectTimestampDependence,
   ];
 
-  const detectorResults = await Promise.all(
-    detectorFns.map((fn) => Promise.resolve(fn(sourceCode, lines, filename)))
+  const detectorPromises = detectorFns.map((fn) =>
+    timeout(Promise.resolve(fn(sourceCode, lines, filename)), 5000)
   );
 
-  findings.push(...detectorResults.flat());
+  const settled = await Promise.allSettled(detectorPromises);
+  settled.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      findings.push(...result.value);
+    } else {
+      console.warn(`Solidity detector failed: ${detectorFns[index].name} - ${result.reason?.message || result.reason}`);
+    }
+  });
+
   findings = deduplicate(findings);
   
   const severityScore = { critical: 25, high: 15, medium: 10, low: 5 };
@@ -344,12 +357,19 @@ async function analyzeSolanaProgram(programId, network = 'mainnet') {
   const info = await getProgramInfo(programId, network);
   const findings = [];
 
-  const detectorResults = await Promise.all(
-    solanaDetectors.detectors.map((detector) => Promise.resolve(detector(info)))
+  const detectorPromises = solanaDetectors.detectors.map((detector) =>
+    timeout(Promise.resolve(detector(info)), 5000)
   );
 
-  findings.push(...detectorResults.flat());
-  
+  const settled = await Promise.allSettled(detectorPromises);
+  settled.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      findings.push(...result.value);
+    } else {
+      console.warn(`Solana detector failed: ${solanaDetectors.detectors[index].name || 'anonymous'} - ${result.reason?.message || result.reason}`);
+    }
+  });
+
   const riskScore = findings.reduce((sum, f) => sum + (f.severity === 'medium' ? 10 : 5), 0);
   return { programId, network, executable: info.executable, findings, riskScore };
 }
