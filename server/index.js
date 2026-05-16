@@ -267,7 +267,14 @@ app.post('/api/auth/register', scanLimiter, async (req, res) => {
     console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
     console.log("DEBUG login result keys:", Object.keys(result)); console.log("DEBUG access_token exists:", !!result.access_token);
     if (!response.ok) { return res.status(400).json({ ok: false, error: result.msg || 'Registration failed' }); }
-    res.json({ ok: true, user: result.user, access_token: result.access_token, token: result.access_token, refresh_token: result.refresh_token });
+    res.json({
+      ok: true,
+      user: result.user,
+      access_token: result.access_token,
+      token: result.access_token,
+      refresh_token: result.refresh_token,
+      session: result.session || null,
+    });
   } catch (error) { res.status(500).json({ ok: false, error: error.message }); }
 });
 

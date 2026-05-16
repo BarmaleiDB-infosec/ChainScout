@@ -57,7 +57,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      await registerUser(email, password);
+      const data = await registerUser(email, password);
+
+      if (data?.session) {
+        if (data.access_token) {
+          localStorage.setItem('access_token', data.access_token);
+        }
+        if (data.refresh_token) {
+          localStorage.setItem('refresh_token', data.refresh_token);
+        }
+        if (data.user?.email) {
+          localStorage.setItem('user_email', data.user.email);
+          localStorage.setItem('user_id', data.user.id);
+        }
+
+        window.location.href = "/dashboard";
+        return;
+      }
 
       toast({
         title: t('registrationSuccess'),

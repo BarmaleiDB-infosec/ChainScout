@@ -286,19 +286,26 @@ function deduplicate(findings) {
   return unique;
 }
 
-function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
+async function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
   const lines = sourceCode.split('\n');
   let findings = [];
   
-  findings.push(...detectVersionPragma(sourceCode, lines, filename));
-  findings.push(...detectReentrancy(sourceCode, lines, filename));
-  findings.push(...detectIntegerArithmetic(sourceCode, lines, filename));
-  findings.push(...detectTxOrigin(sourceCode, lines, filename));
-  findings.push(...detectUncheckedCalls(sourceCode, lines, filename));
-  findings.push(...detectDelegatecall(sourceCode, lines, filename));
-  findings.push(...detectAccessControl(sourceCode, lines, filename));
-  findings.push(...detectTimestampDependence(sourceCode, lines, filename));
-  
+  const detectorFns = [
+    detectVersionPragma,
+    detectReentrancy,
+    detectIntegerArithmetic,
+    detectTxOrigin,
+    detectUncheckedCalls,
+    detectDelegatecall,
+    detectAccessControl,
+    detectTimestampDependence,
+  ];
+
+  const detectorResults = await Promise.all(
+    detectorFns.map((fn) => Promise.resolve(fn(sourceCode, lines, filename)))
+  );
+
+  findings.push(...detectorResults.flat());
   findings = deduplicate(findings);
   
   const severityScore = { critical: 25, high: 15, medium: 10, low: 5 };
@@ -311,6 +318,7 @@ function analyzeSolidityCode(sourceCode, filename = 'Contract.sol') {
 // INFURA INTEGRATION
 // ============================================
 const { getContractBytecode } = require('./infura-client');
+const solanaDetectors = require('./solana-detectors');
 
 async function analyzeBytecodeViaInfura(address, chain = 'mainnet') {
   const bytecode = await getContractBytecode(address, chain);
@@ -335,10 +343,12 @@ const { getProgramInfo } = require('./solana-client');
 async function analyzeSolanaProgram(programId, network = 'mainnet') {
   const info = await getProgramInfo(programId, network);
   const findings = [];
-  
-  if (info.owner === 'BPFLoaderUpgradeab1e11111111111111111111111') {
-    findings.push({ category: 'Upgradeable Program', severity: 'medium', description: 'Program is upgradeable.' });
-  }
+
+  const detectorResults = await Promise.all(
+    solanaDetectors.detectors.map((detector) => Promise.resolve(detector(info)))
+  );
+
+  findings.push(...detectorResults.flat());
   
   const riskScore = findings.reduce((sum, f) => sum + (f.severity === 'medium' ? 10 : 5), 0);
   return { programId, network, executable: info.executable, findings, riskScore };
